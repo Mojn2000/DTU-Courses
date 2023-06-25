@@ -26,3 +26,9 @@ Each assignment is contained within its own directory and may include relevant f
 
 If you have any questions, need clarifications, or would like to discuss any of the assignments or related topics, please feel free to contact me directly (mads.esben.hansen@gmail.com). I am always open to engaging in discussions and helping fellow learners.
 
+## Didn't find what you were looking for?
+
+If you didn't find what you were looking for, or maybe you just want another answer? Try checking out the git by my dear friend:
+
+https://github.com/anton96121/Courses-DTU
+
