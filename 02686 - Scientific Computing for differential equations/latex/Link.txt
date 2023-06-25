@@ -1,0 +1,5 @@
+Local latex:
+https://bitbucket.org/_laursen/laursens-xelatex-thesis-template/src/master/
+
+Overleaf:
+https://da.overleaf.com/latex/templates/technical-university-of-denmark-laursens-thesis-template/ckjrxkzjtnpb

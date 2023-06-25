@@ -1,0 +1,380 @@
+clear all
+
+%% Stability
+precision = 0.1;
+xlimit = [-20,20];
+ylimit = [-20,20];
+
+% ESDIRK23
+gamma = 1-1/sqrt(2);
+        a31 = (1-gamma)/2;
+        AT = [0 gamma a31;0 gamma a31;0 0 gamma];
+        c  = [0; 2*gamma; 1];
+        b  = AT(:,3);
+stability(AT',b,c,xlimit,ylimit,precision,"ESDIRK23");
+
+
+bhat = [    (6*gamma-1)/(12*gamma); ...
+    1/(12*gamma*(1-2*gamma)); ...
+    (1-3*gamma)/(3*(1-2*gamma))    ];
+
+stability(AT',bhat,c,xlimit,ylimit,precision,"ESDIRK23, Embedded");
+%% L-stability
+
+% ESDIRK solution
+mu = 0;
+t0 = 0;
+tfinal = 2*1.5;
+x0 = [0];
+h0 = 0.01;
+options = struct('step_control',false, 'initialStepSize', false, 'Jac' , @LstableJac);
+[Xout,Tout,function_calls1,hs1] = ODEsolver(@Lstable,[mu],h0,t0,tfinal,x0, "ESDIRK23", options);
+
+t = Tout;
+x = Xout;
+
+
+A = [0];
+b = [1]';
+c = [0]';
+T = 1;
+x0 = [0];
+h = 1.5/(40*2.25);
+t0 = 0;
+lambda = 0;
+[t_itra,x_itra] = itrapez(@Lstable,[t0 T],x0,T/h,@LstableJac,1e-4,100);
+% plot results
+figure
+plot(t,x,t_itra,x_itra)
+hold on
+plot(t0,x0, 'x', 'MarkerSize', 10, 'color', 'r')
+xlim([-0.1,T])
+xlabel("t")
+ylabel("x(t)")
+legend("ESDIRK23", "Trapezoidal", "x(0)=x0")
+
+%% A stability
+mu = 0;
+t0 = 0;
+tfinal = 8000;
+x0 = [1;0];
+h0 = 0.01;
+options = struct('Jac' , @Astable_half_Jac,'Rtol',0.1,'Atol',0.1);
+[Xout,Tout,function_calls1,hs1] = ODEsolver(@Astable_half,[mu],h0,t0,tfinal,x0, "ESDIRK23", options);
+t = Tout;
+x = Xout;
+
+mu = 0;
+t0 = 0;
+tfinal = 800;
+x0 = [1;0];
+h0 = 0.01;
+options = struct('Jac' , @Astable_half_Jac,'Rtol',0.0001,'Atol',0.0001);
+[Xout,Tout,function_calls1,hs1] = ODEsolver(@Astable_half,[mu],h0,t0,tfinal,x0, "ESDIRK23", options);
+t = Tout;
+x2 = Xout;
+
+h = 0.1;
+[t,x_itra_high] = itrapez(@Astable_half,[t0 tfinal],x0,tfinal/h,@Astable_half_Jac,1e-4,100);
+
+
+fig1 = figure;
+pos_fig1 = [600 400 900 500];
+set(fig1,'Position',pos_fig1)
+tiledlayout(1,2)
+
+nexttile
+hold on
+plot(x_itra_high(1,:),x_itra_high(2,:))
+plot(x0(1),x0(2), 'x', 'MarkerSize', 20, 'color', 'r')
+xlim([-1.3,1.7])
+ylim([-1.3,1.3])
+xlabel("x1")
+ylabel("x2")
+title("AbsTol = RelTol = 0.1")
+plot(x(:,1),x(:,2), 'o', 'color', 'b')
+legend("Analytical solution", "x(0)=x0","ESDIRK23",'AutoUpdate','off')
+
+nexttile
+hold on
+plot(x_itra_high(1,:),x_itra_high(2,:))
+plot(x0(1),x0(2), 'x', 'MarkerSize', 20, 'color', 'r')
+xlim([-1.3,1.7])
+ylim([-1.3,1.3])
+xlabel("x1")
+ylabel("x2")
+title("AbsTol = RelTol = 0.0001")
+plot(x2(:,1),x2(:,2), 'o', 'color', 'b')
+legend("Analytical solution", "x(0)=x0","ESDIRK23",'AutoUpdate','off')
+
+
+%% %% MU = 20, adaptive step size
+h = 0.1;
+t0 = 0;
+mu = 20;
+tend = 4*mu;
+x0 = [1.0; 1.0];
+Atol = 10^(-2);
+Rtol = Atol;
+
+% using the DOPRI54 method
+options = struct('step_control',true, 'initialStepSize',true,'control_type', "PID",'Rtol',Rtol,'Atol',Atol);
+tic
+[X1,T1,function_calls1,hs1,rs1] = ODEsolver(@VanPol,[mu],h,t0,tend,x0, "ESDIRK23", options);
+time1 = toc;
+
+Atol = 10^(-4);
+Rtol = Atol;
+% using the DOPRI54 method
+options = struct('step_control',true, 'initialStepSize',true,'control_type', "PID",'Rtol',Rtol,'Atol',Atol);
+tic
+[X2,T2,function_calls2,hs2,rs2] = ODEsolver(@VanPol,[mu],h,t0,tend,x0, "ESDIRK23", options);
+time2 = toc;
+
+Atol = 10^(-6);
+Rtol = Atol;
+% using the DOPRI54 method
+options = struct('step_control',true, 'initialStepSize',true,'control_type', "PID",'Rtol',Rtol,'Atol',Atol);
+tic
+[X3,T3,function_calls3,hs3,rs3] = ODEsolver(@VanPol,[mu],h,t0,tend,x0, "ESDIRK23", options);
+time3 = toc;
+
+options = odeset('RelTol',0.000001,'AbsTol',0.000001);
+[Tode45,Xode45] = ode45(@VanPol,[t0 tend],x0,options,mu);
+
+[Tode15s,Xode15s]=ode15s(@VanPol,[t0 tend],x0,options,mu);
+
+%
+fig = figure('Position',[10 10 800 600]);
+
+subplot(3, 3, 1)
+plot(T1,X1(:,1),'LineWidth', 1.5)
+hold on 
+plot(Tode45,Xode45(:,1), '-.','LineWidth', 1.5)
+plot(Tode15s,Xode15s(:,1), '--','LineWidth', 1.5)
+title('Atol = Rtol = $10^{-2}$','FontSize',16,'Interpreter','latex')
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("$x_1$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+subplot(3, 3, 2)
+plot(T2,X2(:,1),'LineWidth', 1.5)
+hold on 
+plot(Tode45,Xode45(:,1), '-.','LineWidth', 1.5)
+plot(Tode15s,Xode15s(:,1), '--','LineWidth', 1.5)
+title('Atol = Rtol = $10^{-4}$','FontSize',16,'Interpreter','latex')
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("$x_1$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+subplot(3, 3, 3)
+plot(T3,X3(:,1),'LineWidth', 1.5)
+hold on 
+plot(Tode45,Xode45(:,1), '-.','LineWidth', 1.5)
+plot(Tode15s,Xode15s(:,1), '--','LineWidth', 1.5)
+title('Atol = Rtol = $10^{-6}$','FontSize',16,'Interpreter','latex')
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("$x_1$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+subplot(3, 3, 4)
+plot(T1,X1(:,2),'LineWidth', 1.5)
+hold on 
+plot(Tode45,Xode45(:,2), '-.','LineWidth', 1.5)
+plot(Tode15s,Xode15s(:,2), '--','LineWidth', 1.5)
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("$x_2$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+subplot(3, 3, 5)
+plot(T2,X2(:,2),'LineWidth', 1.5)
+hold on 
+plot(Tode45,Xode45(:,2), '-.','LineWidth', 1.5)
+plot(Tode15s,Xode15s(:,2), '--','LineWidth', 1.5)
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("$x_2$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+subplot(3, 3, 6)
+plot(T3,X3(:,2),'LineWidth', 1.5)
+hold on 
+plot(Tode45,Xode45(:,2), '-.','LineWidth', 1.5)
+plot(Tode15s,Xode15s(:,2), '--','LineWidth', 1.5)
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("$x_2$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+subplot(3, 3, 7)
+plot(X1(:,1),X1(:,2),'LineWidth', 1.5)
+hold on 
+plot(Xode45(:,1),Xode45(:,2), '-.','LineWidth', 1.5)
+plot(Xode15s(:,1),Xode15s(:,2), '--','LineWidth', 1.5)
+xlabel("$x_1$",'FontSize',16,'Interpreter','latex')
+ylabel("$x_2$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+subplot(3, 3, 8)
+plot(X2(:,1),X2(:,2),'LineWidth', 1.5)
+hold on 
+plot(Xode45(:,1),Xode45(:,2), '-.','LineWidth', 1.5)
+plot(Xode15s(:,1),Xode15s(:,2), '--','LineWidth', 1.5)
+xlabel("$x_1$",'FontSize',16,'Interpreter','latex')
+ylabel("$x_2$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+subplot(3, 3, 9)
+plot(X3(:,1),X3(:,2),'LineWidth', 1.5)
+hold on 
+plot(Xode45(:,1),Xode45(:,2), '-.','LineWidth', 1.5)
+plot(Xode15s(:,1),Xode15s(:,2), '--','LineWidth', 1.5)
+xlabel("$x_1$",'FontSize',16,'Interpreter','latex')
+ylabel("$x_2$",'FontSize',16,'Interpreter','latex')
+grid on 
+
+sgtitle('Dormand-Prince 5(4) with adaptive step size, $\mu = 3$','Interpreter','latex','FontSize',20) 
+ 
+
+% add a bit space to the figure
+fig = gcf;
+%fig.Position(3) = fig.Position(3) + 250;
+% add legend
+Lgnd = legend('show');
+Lgnd.Position(1) = 0.449;
+Lgnd.Position(2) = -0.0;
+legend("DoPri54","ode45","ode15s",'NumColumns',3,'FontSize',16,'Interpreter','latex');
+
+
+fig = figure('Position',[10 10 800 600]);
+T1 = T1(2:end-1);
+T2 = T2(2:end-1);
+T3 = T3(2:end-1);
+hs1 = hs1(:,1:end-1);
+hs2 = hs2(:,1:end-1);
+hs3 = hs3(:,1:end-1);
+subplot(1, 3, 1)
+semilogy(T1,hs1(1,:),'LineWidth', 1.5)
+hold on
+semilogy(T1(hs1(2,:)>1),hs1(1,hs1(2,:)>1),'x', 'color', 'r','MarkerSize',12)
+title('Atol = Rtol = $10^{-2}$','FontSize',16,'Interpreter','latex')
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("h",'FontSize',16,'Interpreter','latex')
+ylim([10^(-5),10])
+grid on 
+
+subplot(1, 3, 2)
+semilogy(T2,hs2(1,:),'LineWidth', 1.5)
+hold on
+semilogy(T2(hs2(2,:)>1),hs2(1,hs2(2,:)>1),'x', 'color', 'r','MarkerSize',12)
+title('Atol = Rtol = $10^{-4}$','FontSize',16,'Interpreter','latex')
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("h",'FontSize',16,'Interpreter','latex')
+ylim([10^(-5),10])
+grid on 
+
+subplot(1, 3, 3)
+semilogy(T3,hs3(1,:),'LineWidth', 1.5)
+hold on
+semilogy(T3(hs3(2,:)>1),hs3(1,hs3(2,:)>1),'x', 'color', 'r','MarkerSize',12)
+title('Atol = Rtol = $10^{-6}$','FontSize',16,'Interpreter','latex')
+xlabel("t",'FontSize',16,'Interpreter','latex')
+ylabel("h",'FontSize',16,'Interpreter','latex')
+ylim([10^(-5),10])
+grid on 
+
+sgtitle('Dormand-Prince 5(4) with adaptive step size, $\mu = 20$','Interpreter','latex','FontSize',20) 
+ 
+
+% add a bit space to the figure
+fig = gcf;
+%fig.Position(3) = fig.Position(3) + 250;
+% add legend
+Lgnd = legend('show');
+Lgnd.Position(1) = 0.449;
+Lgnd.Position(2) = 0;
+legend("Step size","Rejections",'NumColumns',2,'FontSize',16,'Interpreter','latex');
+
+
+%% Van Pol
+h = 0.1;
+t0 = 0;
+mu = 20;
+tend = 4*mu;
+x0 = [1.0; 1.0];
+Atol = 10^(-2);
+Rtol = Atol;
+
+options = struct('Jac' , @VanPolJac,'Rtol',0.0001,'Atol',0.0001);
+[Xout,Tout,function_calls1,hs1] = ODEsolver(@VanPol,[mu],h,t0,tend,x0, "ESDIRK23", options);
+t = Tout;
+x = Xout;
+
+ESDIRKperformance(function_calls1, hs1)
+%%
+nStep = 1:1:info.nStep;
+
+% plot results
+figure
+subplot(2,1,1)
+plot(t,x(:,1),'.-b'), title('Van der Pol solution')
+subplot(2,1,2)
+plot(t,x(:,2),'.-r'), xlabel('Time')
+
+
+
+
+%%
+function [] = stability(A,b,c,xlimit,ylimit, precision,titletext)
+    s = length(b);
+    re = [xlimit(1):precision:xlimit(2)];
+    im = [ylimit(1):precision:ylimit(2)];
+    abs_matrix = zeros(length(re),length(im));
+    fprintf('\n');
+    reverseStr = '';
+    for i = 1:length(re)
+        for j = 1:length(im)
+            abs_matrix(i,j) = abs(1+complex(re(i),im(j))*b'*inv(eye(s)-complex(re(i),im(j))*A)*ones(s,1));
+
+        end
+       percentDone = 100 * i / length(re);
+       msg = sprintf('Percent done: %3.1f', percentDone);
+       fprintf([reverseStr, msg]);
+       reverseStr = repmat(sprintf('\b'), 1, length(msg));
+    end
+    fprintf('\n');
+    plot_matrix = abs_matrix;
+    %plot_matrix = (abs_matrix > 1);
+    plot_matrix(plot_matrix>1) = 1.0;
+    %plot_matrix(round(plot_matrix,1)==1.0) = 0;
+
+    figure
+    hold on 
+    %map = jet(256);
+    %map(end,:) = [1,1,1]';
+    map = [repmat([1 0 0],1000,1);[1,1,1]];
+    colormap(map)
+    %colorbar;
+    stabMap = imagesc(re',im',plot_matrix');
+    alpha(stabMap,0.6);
+    grid on
+    plot(re,zeros(1,length(re)),'k', 'LineWidth', 0.5)
+    plot(zeros(1,length(im)),im,'k', 'LineWidth', 0.5)
+    xlim([min(re) max(re)])
+    ylim([min(im) max(im)])
+    title(titletext)
+    hgh = plot(1000,10000,'o','color','r',"MarkerFaceColor", "r" );
+    legend(hgh, "Stable")
+
+
+    if all(all(abs_matrix(re<0,:)<1))
+        disp('The method is A-stable')
+        if all(all(abs_matrix(re>0,:)>1))
+            disp('Only Re(z)<0 behaves stable')
+        end
+        if b'*inv(A)*ones(s,1)-1 < 0.000001
+            disp('The method is L-stable')
+        end
+    else
+        disp('The method is not A-stable')
+    end
+
+end

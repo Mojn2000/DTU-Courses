@@ -1,0 +1,278 @@
+\chapter{Explicit ODE solver}
+In the following, we consider the initial value problem (IVP) on the form
+\begin{align}
+    \dot{x}(t) &= f(t,x(t),p), & x(t_0) = x_0,
+\end{align}
+where $x \in \probR ^{n_x}$ and $p \in \probR ^{n_p}$. 
+
+\section{Description of explicit Euler}
+Our goal is to solve the IVP using a scientific, i.e., numeric, method. We remember that $\dot{x}(t)$ is given by the limit (multiple equal limits exist)
+\begin{align}
+    \dot{x}(t) &:= \lim_{h \rightarrow 0} \frac{x(t+h)-x(t)}{h}.
+\end{align}
+Since we are using numerical methods, we cannot represent the actual limit value. Instead, we have to use some finite approximation thereof. Choosing some $h>0$ therefore naturally leads to the approximation
+\begin{align}
+    \dot{x}(t) &\approx \frac{x(t+h)-x(t)}{h}, &h>0.
+\end{align}
+By rearranging the terms (isolating $x(t+h)$) we get
+\begin{align}
+    x(t+h) \approx x(t) + \dot{x}(t) h.
+\end{align}
+In fact, this corresponds to a first order Taylor expansion around $t$! From our basic course in calculus we therefore know that
+\begin{align}
+    x(t+h) &= x(t) + \dot{x}(t) h + \mathcal{O}(h^2).
+    \label{eq2:ex_euler}
+\end{align}
+We now have a way to determine $x(t+h)$. This method is known as the explicit Euler method. 
+
+\section{Explicit Euler fixed time step implementation}
+When using the explicit Euler method, it is important to choose a suitable step size, $h$. Figure \ref{fig1:ex_stability} shows the stability region of the explicit Euler method for $\mu = \lambda h$ for the test equation. Notice that \textit{suitable} has to be seen in the in the context of the problem at hand. The most simple approach is to use a fixed step size; however, when doing so the user must select it very carefully. Listing \ref{lst2:ex_euler} shows an matlab implementation of the explicit Euler method.
+
+\begin{lstlisting}[language=Matlab,caption=Explicit Euler with fixed step size,label=lst2:ex_euler]
+function [t,x] = ExplicitEuler(fun,t0,tn,n,x0,varargin)
+    % Explicit euler scheme 
+    % f(x_t+1) = f(x_t) + f'(x_t)*h
+    
+    h = (tn-t0)/n; % Set the step size
+    nx = size(x0,1);
+    x = zeros(nx,n+1);
+    t = zeros(1,n+1);
+
+	t(:,1) = t0;
+	x(:,1) = x0;
+    for k=1:n
+        f = feval(fun,t(k),x(:,k),varargin{:}); % make function evaluation 
+        t(:,k+1) = t(:,k) + h;  % update the time step
+        x(:,k+1) = x(:,k) + f*h; % update the function value
+    end
+	t = t';
+	x = x';
+\end{lstlisting}
+
+
+\section{Explicit Euler adaptive time step implementation}
+Sometimes it can be difficult to select a suitable step size, $h$. When dealing with problem with a more rich dynamic than the test equation, we might see that a smaller step size might be required in parts of the solution than others. To overcome this problem with a fixed step size, we must select a small step size and use that everywhere. However, this comes with a significant penalty to the speed, since we could get away with using a larger step size in most of the solution. This problem leads to a natural desire to construct an algorithm that can change the step size adaptively. The goal is to use as large step size as possible, while maintaining a sufficient accuracy in the individual steps. 
+
+We therefore need some way of estimating the error, we do so using what is known as \textit{step doubling}. We have
+\begin{align}
+    x_{k+1} &= x_k + hf(t_k,x_k), \\
+    \hat{x}_{k+1/2} &= x_k + \frac{h}{2}f(t_k,x_k), \ \text{and} \\
+    \hat{x}_{k} &= \hat{x}_{k+1/2} + \frac{h}{2}f(t_k+\frac{h}{2},\hat{x}_{k+1/2}).
+\end{align}
+We now get the error estimate by means of step doubling by
+\begin{align}
+    e_{k+1} &= \hat{x}_{k+1} - x_{k+1}.
+\end{align}
+We are now able to define how to select the best step size, $h$. We do so by the \textit{asymptotic step size controller}, this means that our step size is given by
+\begin{align}
+    h_{k+1} &= \left(\frac{\varepsilon}{r_{k+1}} \right )^{1/2} h_k.
+\end{align}
+Where $r_{k+1}$ is found by
+\begin{align}
+    r_{k+1} &= \max_{i \in \{1,...,n_x\}} \left \{ \frac{|e_{k+1}|_i}{ \max \{ |\text{abstol}|_i, \ |x_{k+1}|_i \cdot |\text{reltol}|_i \} } \right \}
+\end{align}
+where $|\text{abstol}|_i$ and $|\text{reltol}|_i$ are the absolute and relative tolerance of $(x_{k+1})_i$ respectively. Listing \ref{lst2:ex_euler_adap} shows a matlab implementation of explicit Euler method with step doubling and asymptotic step size controller. 
+
+\begin{lstlisting}[language=Matlab,caption=Explicit Euler with adaptive step size.,label=lst2:ex_euler_adap]
+function [T,X,E,H,count_nfun,count_acp,count_rej] = ExplicitEulerAdaptiveStep(fun,tspan,x0,h0,abstol,reltol,varargin)
+    % Explicit euler scheme with adaptive step length (h)
+    % f(x_t+1) = f(x_t) + f'(x_t)*h
+    
+    epstol = 0.8; 
+    facmin = 0.1; 
+    facmax = 5.0; 
+
+    t0 = tspan(1); 
+    tf = tspan(2); 
+
+    t = t0; 
+    h = h0; 
+    x = x0; 
+
+    T = t; 
+    X = x'; 
+    E = 0;
+    H = h0; 
+    
+    count_acp = 0; 
+    count_step = 0; 
+    count_nfun = 0; 
+    count_rej = 0; 
+
+    while t < tf 
+        if (t+h>tf)
+            h = tf - t; 
+        end 
+
+        f = feval(fun,t,x,varargin{:});
+        AcceptStep = false;
+        while ~AcceptStep
+            x1 = x + h*f; 
+
+            hm = 0.5*h; 
+            tm = t + hm; 
+            xm = x + hm*f; 
+            fm = feval(fun,tm,xm,varargin{:});
+            x1hat = xm + hm*fm; 
+
+            e = x1hat-x1; 
+            r = max( abs(e) ./ max(abstol, abs(x1hat).*reltol) ); 
+
+            AcceptStep = (r <= 1.0);
+            if AcceptStep
+                t = t+h; 
+                x = x1hat; 
+                E = [E;abs(e)'];
+                H = [H;h];
+
+                T = [T;t];
+                X = [X;x'];
+                count_acp = count_acp + 1;
+            else 
+                count_rej = count_rej + 1; 
+            end
+            h = max(facmin, min(sqrt(epstol/r),facmax))*h; % change step size
+            count_step = count_step + 1;
+        end 
+        count_nfun = count_step + count_rej;
+    end
+\end{lstlisting}
+
+
+\section{Test on Van der Pol problem and comparison with Matlab ODE solvers}
+Now that we have made an implementation of the explicit Euler method with both fixed and adaptive step size we want to compare these. To do so we look at the Van der Pol problem given by
+\begin{align}
+    \Ddot{x}(t) &= \mu (1-x(t)^2) \dot{x}(t) - x(t).
+\end{align}
+To solve the problem using the explicit Euler method we must first re-write the problem as a system of first order differential equations. Luckily this is done easily and given by
+\begin{align}
+    \dot{x}_1(t) &= x_2(t) \\
+    \dot{x}_2(t) &= \mu(1-x_1(t)^2) x_2(t) - x_1(t).
+\end{align}
+
+We will now test the explicit Euler method on the Van der Pol problem with $\mu = 3$ and $\mu = 20$. 
+
+\subsection{Van der Pol, $\mu = 3$}
+The Van der Pol problem with $\mu = 3$ is a relatively straight forward non-stiff problem. There is no formal definition of when a problem is \textit{stiff}---only that whenever a problem change dynamics "very quickly" it is said to be. 
+
+Figure \ref{fig2:fixed_mu3} shows the numerical solution to the Van der Pol problem with $\mu = 3$ for explicit Euler with $h \in \{0.1, 0.01, 0.001\}$, ODE45 and ODE15s. Notice that there is no visible difference between the solution obtained by ODE45 and ODE15s. Notice also that for $h=0.1$ there is a quite big difference between the explicit Euler solution and the other solutions; for $h=0.01$ the difference is smaller and for $h=0.001$ there is no visible difference anymore. This hints that it is a bad idea to use a step size larger than $h=0.001$ for this particular problem.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/opg2/mu3_fixed.png}
+    \caption{Solution to Van der Pol with $\mu = 3$ using fixed step sizes}
+    \label{fig2:fixed_mu3}
+\end{figure}
+
+Table \ref{tab2:mu3_fixed} shows that CPU time and number of function evaluations when solving the Van der Pol problem with $\mu = 3$ using different time steps and Matlab ODE solvers. Notice that with $h=0.1$ the explicit Euler is much faster and uses less function evaluations that any of the other methods, however, as seen above the results are also quite poor. A time step of $h=0.01$ yields similar run time to ODE45---but with a slight deviation in the results. A step size of $h=0.001$ is by far the slowest of the methods, and the one that uses the most function evaluations. One of the reasons why ODE45 and ODE15s are able to outperform the explicit Euler with fixed step size is because they are able to adjust the step size such that a larger step size is used in the parts with a slower dynamic and vice versa. 
+
+Notice that ODE45 seems to outperform ODE15s. This is a good indication that the problem is not particular stiff, i.e., it is not worth while to use an implicit method that comes with additional computational cost. 
+
+\begin{table}[H]
+    \centering
+    \caption{CPU time and function evaluations of explicit Euler with fixed time step and Matlab ODE solvers}
+    \begin{tabular}{|c||c|c|c|c|c|c|} \hline
+         \textbf{Method}    & $h=0.1$&   $h=0.01$ & $h=0.001$ & ODE45 & ODE15s     \\ \hline \hline 
+         \textbf{Time}      & 0.0007 &    0.0067  &    0.0389 & 0.0046 & 0.0175   \\ \hline
+         \textbf{Fun evals} & 120   & 1200 & 12000 & 1069 & 926  \\ \hline
+    \end{tabular}
+    \label{tab2:mu3_fixed}
+\end{table}
+
+
+
+Figure \ref{fig2:adap_mu3} shows the numerical solution to the Van der Pol problem with $\mu = 3$ for explicit Euler with adaptive time steps and $AbsTol=RelTol \in \{10^{-2}, 10^{-4}, 10^{-6}\}$, ODE45 and ODE15s. Notice also that for $Tol = 10^{-2}$ there is a quite big difference between the explicit Euler solution and the other solutions; for $Tol = 10^{-4}$ the difference is almost not visible and for $Tol = 10^{-6}$ there is no visible difference anymore.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/opg2/mu3_adap.png}
+    \caption{Solution to Van der Pol with $\mu = 3$ using adaptive step sizes}
+    \label{fig2:adap_mu3}
+\end{figure}
+
+Table \ref{tab2:mu3_adap} shows that CPU time and number of function evaluations when solving the Van der Pol problem with $\mu = 3$ using different tolerances and Matlab ODE solvers. Notice that with $Tol = 10^{-2}$ the explicit Euler is faster and uses less function evaluations that any of the other methods, however, as seen above the results are also quite poor. Using $Tol = 10^{-4}$ yields higher run time than ODE45, but with very little deviation in the results. Finally $Tol = 10^{-6}$ is by far the slowest of the methods, and the one that uses the most function evaluations. One of the reasons why ODE45 and ODE15s are able to outperform the explicit Euler with adaptive step size is because they are higher order method and implicit method respectively. This means that they are able to take larger step sizes, which requires less time.
+
+\begin{table}[H]
+    \centering
+    \caption{CPU time and function evaluations of explicit Euler with adaptive time step and Matlab ODE solvers}
+    \begin{tabular}{|c||c|c|c|c|c|c|} \hline
+         \textbf{Method}    & $Tol = 10^{-2}$&   $Tol = 10^{-4}$ & $Tol = 10^{-6}$ & ODE45 & ODE15s     \\ \hline \hline 
+         \textbf{Time}      & 0.0039  &  0.0730  &  0.1680 & 0.0046 & 0.0175   \\ \hline
+         \textbf{Fun evals} & 482   & 4181 & 41780 & 1069 & 926  \\ \hline
+    \end{tabular}
+    \label{tab2:mu3_adap}
+\end{table}
+
+Figure \ref{fig2:adap_mu3_h} shows the used step sizes for the different tolerances. The red crosses mark whenever the step size controller failed to set the step size correctly, i.e., whenever the estimated (using step doubling) error was larger than the allowed maximum. Notice that the behaviour of all three tolerances are quite similar. Also notice that the step sizes vary by almost a factor 100! This means that even though the problem is not very stiff, there still is enough change in dynamics that the optimal step size vary by a factor 100. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/opg2/mu3_h.png}
+    \caption{Step sizes when solving the Van der Pol with $\mu = 3$ at different tolerances}
+    \label{fig2:adap_mu3_h}
+\end{figure}
+
+\subsection{Van der Pol, $\mu = 20$}
+The Van der Pol problem with $\mu = 20$ is a more complicated problem. The dynamics of the problem is largely defined by the $\mu$ parameter. In particular, the problem becomes more stiff when $\mu$ is increased.
+
+Figure \ref{fig2:fixed_mu20} shows the numerical solution to the Van der Pol problem with $\mu = 3$ for explicit Euler with $h \in \{0.1, 0.01, 0.001\}$, ODE45 and ODE15s. Notice that there is no visible difference between the solution obtained by ODE45 and ODE15s. For $h=0.1$ the solution diverges! It is not at all possible to solve the problem with such a large step size. There is a quite big difference between the explicit Euler solution and the other solutions for $h=0.01$. The difference is smaller for $h=0.001$, but it is still visible. This hints that it is a bad idea to use a step size larger than $h=0.001$ for this particular problem, and in fact we should use an even lower step size.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/opg2/fixed_mu20.png}
+    \caption{Solution to Van der Pol with $\mu = 20$ using fixed step sizes}
+    \label{fig2:fixed_mu20}
+\end{figure}
+
+Table \ref{tab2:mu20_fixed} shows that CPU time and number of function evaluations when solving the Van der Pol problem with $\mu = 20$ using different time steps and Matlab ODE solvers. Notice that with $h=0.1$ the explicit Euler is much faster and uses less function evaluations that any of the other methods, however, as seen above the results are also completely wrong. A time step of $h=0.01$ yields similar run time to ODE45---but with substantial deviations in the results. A step size of $h=0.001$ is by far the slowest of the methods, and the one that uses the most function evaluations. One of the reasons why ODE45 and ODE15s are able to outperform the explicit Euler with fixed step size is because they are able to adjust the step size such that a larger step size is used in the parts with a slower dynamic and vice versa. 
+
+Notice that ODE45 does not outperform ODE15s anymore. This is a good indication that the problem is stiff, i.e., it is worth while to use an implicit method that even when it comes with additional computational cost. The implicit method is also able to use far less function evaluations than the DoPri54. 
+
+\begin{table}[H]
+    \centering
+    \caption{CPU time and function evaluations of explicit Euler with fixed time step and Matlab ODE solvers}
+    \begin{tabular}{|c||c|c|c|c|c|c|} \hline
+         \textbf{Method}    & $h=0.1$&   $h=0.01$ & $h=0.001$ & ODE45 & ODE15s     \\ \hline \hline 
+         \textbf{Time}      & 0.0090  &  0.0382   &  0.2671 & 0.0370 & 0.0504   \\ \hline
+         \textbf{Fun evals} & 800    &    8000    &   80000 & 8461 & 926  \\ \hline
+    \end{tabular}
+    \label{tab2:mu20_fixed}
+\end{table}
+
+
+
+Figure \ref{fig2:adap_mu20} shows the numerical solution to the Van der Pol problem with $\mu = 20$ for explicit Euler with adaptive time steps and $AbsTol=RelTol \in \{10^{-2}, 10^{-4}, 10^{-6}\}$, ODE45 and ODE15s. Notice also that for $Tol = 10^{-2}$ there is a quite big difference between the explicit Euler solution and the other solutions; for $Tol = 10^{-4}$ the difference is almost not visible and for $Tol = 10^{-6}$ there is no visible difference anymore.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/opg2/mu20_adap.png}
+    \caption{Solution to Van der Pol with $\mu = 20$ using adaptive step sizes}
+    \label{fig2:adap_mu20}
+\end{figure}
+
+Table \ref{tab2:mu20_adap} shows the CPU time and number of function evaluations when solving the Van der Pol problem with $\mu = 20$ using different tolerances and Matlab ODE solvers. Notice that with $Tol = 10^{-2}$ the explicit Euler is faster and uses less function evaluations that any of the other methods (as many as ODE15s), however, as seen above the results also deviate from the rest. Using $Tol = 10^{-4}$ yields higher run time than ODE45 and ODE15s, but with very little deviation in the results. Finally $Tol = 10^{-6}$ is by far the slowest of the methods, and the one that uses the most function evaluations (by a quite substantial amount). One of the reasons why ODE45 and ODE15s are able to outperform the explicit Euler with adaptive step size is because they are higher order method and implicit method respectively. This means that they are able to take larger step sizes, which requires less time.
+
+\begin{table}[H]
+    \centering
+    \caption{CPU time and function evaluations of explicit Euler with adaptive time step and Matlab ODE solvers}
+    \begin{tabular}{|c||c|c|c|c|c|c|} \hline
+         \textbf{Method}    & $Tol = 10^{-2}$&   $Tol = 10^{-4}$ & $Tol = 10^{-6}$ & ODE45 & ODE15s     \\ \hline \hline 
+         \textbf{Time}      & 0.0131  &  0.2286  &  0.5656 & 0.0386 & 0.0612   \\ \hline
+         \textbf{Fun evals} & 3137   &    13154  &    111656 & 8461 & 2944  \\ \hline
+    \end{tabular}
+    \label{tab2:mu20_adap}
+\end{table}
+
+Figure \ref{fig2:adap_mu20_h} shows the used step sizes for the different tolerances. The red crosses mark whenever the step size controller failed to set the step size correctly, i.e., whenever the estimated (using step doubling) error was larger than the allowed maximum. Notice that the behaviour of all three tolerances are quite similar. Also notice that the step sizes vary by more than a factor 1000! This is a good indication that the problem is stiff. Also notice that for $AbsTol=RelTol \in \{10^{-2}, 10^{-4}\}$ the step size controller fails at setting the correct step size many times. This again indicates that there is a rapid change in dynamics, which leads to a large needed change in step size.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/opg2/mu20_h.png}
+    \caption{Step sizes when solving the Van der Pol with $\mu = 20$ at different tolerances}
+    \label{fig2:adap_mu20_h}
+\end{figure}
+
+
+
+
+

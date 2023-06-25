@@ -1,0 +1,6 @@
+%!TEX root = ../Thesis.tex
+\RequirePackage[l2tabu,orthodox]{nag} % Old habits die hard
+\RequirePackage{pdftexcmds}
+
+\newcommand{\papersizeswitch}[3]{\ifnum\pdfstrcmp{\papersize}{#1}=0#2\else#3\fi}
+\papersizeswitch{b5paper}{\def\classfontsize{10pt}}{\def\classfontsize{12pt}}
