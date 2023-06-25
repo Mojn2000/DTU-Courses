@@ -1,0 +1,21 @@
+Protocol: ISO_twopass_mutual_CORR # Verified
+
+# The original protocol has a reflection attack that we correct here
+# by a tag in the first message.
+
+Types: Agent A,B,s;
+       Number NA,NB,Text1,Text2,Text3,Text4,tag;
+       Function pk
+
+Knowledge: A: A,B,{A,pk(A)}inv(pk(s)),pk(A),inv(pk(A)),pk(s),tag;
+	   B: B,{B,pk(B)}inv(pk(s)),pk(s),pk(B),inv(pk(B)),tag
+
+
+Actions:
+A->B: {A,pk(A)}inv(pk(s)),{NA,B,Text1,tag}inv(pk(A))
+B->A: {B,pk(B)}inv(pk(s)),{NB,A,Text3}inv(pk(B))
+
+Goals:
+B weakly authenticates A on Text1
+A weakly authenticates B on Text3
+

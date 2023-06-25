@@ -1,0 +1,26 @@
+Protocol: WooLamMutualAuth
+
+# Attack based on parallel sessions
+
+Types: Agent A,B,s;
+       Number NA,NB;
+       Symmetric_key KAB;
+       Function sk
+
+Knowledge: A: A,B,s,sk(A,s);
+	   B: B,A,s,sk(B,s);
+ 	   s: A,B,s,sk(A,s),sk(B,s)
+
+Actions:
+A->B: A,NA
+B->A: B,NB
+A->B: {|A,B,NA,NB|}sk(A,s)
+B->s: {|A,B,NA,NB|}sk(A,s),{|A,B,NA,NB|}sk(B,s)
+s->B: {|B,NA,NB,KAB|}sk(A,s),{|A,NA,NB,KAB|}sk(B,s)
+B->A: {|B,NA,NB,KAB|}sk(A,s),{|NA,NB|}KAB
+A->B: {|NB|}KAB
+
+Goals:
+B authenticates s on KAB,A
+A authenticates s on KAB,B
+KAB secret between A,B

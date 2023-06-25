@@ -1,0 +1,27 @@
+Protocol: H530fix # Bounded-verified
+
+Types: Agent A,B,s;
+       Number X,Y,g,M,t1,t2,t3,t4,t5;
+       Function sk,mac
+
+Knowledge: A: A,s,sk(A,s),B,g,mac,t1,t2,t3,t4,t5;
+	   B: B,s,sk(B,s),g,mac,t1,t2,t3,t4,t5;
+	   s: A,B,s,sk,g,mac,t1,t2,t3,t4,t5
+
+Actions:
+A->B: A,B,exp(g,X),mac(sk(A,s),t1,A,B,exp(g,X))
+B->s: A,B,exp(g,X),mac(sk(A,s),t1,A,B,exp(g,X)),
+      B,exp(g,X),exp(g,Y),
+      mac(sk(B,s),t2,A,B,exp(g,X),mac(sk(A,s),t1,A,B,exp(g,X)),
+		     B,exp(g,X),exp(g,Y))
+s->B: B,A,exp(g,X),mac(sk(A,s),t3,B,exp(g,X),exp(g,Y)),
+      mac(sk(B,s),t4,B,A,exp(g,X),mac(sk(A,s),t3,B,exp(g,X),exp(g,Y)))
+B->A: B,A,exp(g,Y),mac(sk(A,s),t3,B,exp(g,X),exp(g,Y)),
+     mac(exp(exp(g,X),Y),t5,B,A,exp(g,Y),mac(sk(A,s),t3,B,exp(g,X),exp(g,Y)))
+A->B: {|M|}exp(exp(g,X),Y)
+
+Goals:
+A *->* B: M
+
+
+

@@ -1,0 +1,38 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   ISO-five-pass.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 9 nodes
+  depth: 2 plies
+
+ATTACK TRACE:
+(x501,1) -> i: RA(1),Text1(1)
+i -> (s,1): RA(1),x307,i,x308
+(s,1) -> i: Text5(2),{|RA(1),KAB(2),i,Text4(2)|}_(sk(x501,s)),{|x307,KAB(2),x501,Text3(2)|}_(sk(i,s))
+i -> (x501,1): x407,{|RA(1),KAB(2),i,Text4(2)|}_(sk(x501,s)),{|x410,RA(1),x411|}_KAB(2)
+(x501,1) -> i: Text9(3),{|RA(1),x410,Text8(3)|}_KAB(2)
+
+
+% Reached State:
+% 
+% request(x501,s,pAsKABB,KAB(2),i,1)
+% state_rA(x501,2,sk(x501,s),s,i,RA(1),Text1(1),RA(1),Text1(1),x411,x410,{|x410,RA(1),x411|}_KAB(2),Text4(2),KAB(2),{|RA(1),KAB(2),i,Text4(2)|}_(sk(x501,s)),x407,x407,{|RA(1),KAB(2),i,Text4(2)|}_(sk(x501,s)),{|x410,RA(1),x411|}_KAB(2),Text9(3),Text8(3),Text9(3),{|RA(1),x410,Text8(3)|}_KAB(2),1)
+% secrets(KAB(2),secrecyset(x501,1,pKAB),i)
+% contains(secrecyset(x501,1,pKAB),x501)
+% contains(secrecyset(x501,1,pKAB),i)
+% contains(secrecyset(x501,1,pKAB),s)
+% state_rs(s,1,sk(x501,s),sk(i,s),x501,i,x308,x307,RA(1),RA(1),x307,i,x308,Text5(2),KAB(2),Text4(2),Text3(2),Text5(2),{|RA(1),KAB(2),i,Text4(2)|}_(sk(x501,s)),{|x307,KAB(2),x501,Text3(2)|}_(sk(i,s)),1)
+% state_rB(x26,0,sk(x26,s),s,x27,1)
+% contains(secrecyset(s,1,pKAB),s)
+% contains(secrecyset(s,1,pKAB),x501)
+% contains(secrecyset(s,1,pKAB),i)
+% secrets(KAB(2),secrecyset(s,1,pKAB),i)
+% witness(s,i,pAsKABB,KAB(2),x501)
+% witness(s,x501,pBsKABA,KAB(2),i)
+

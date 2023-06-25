@@ -1,0 +1,19 @@
+Protocol: BilateralKeyExchange # Verified & Certified
+
+Types: Agent A,B;
+       Number NA,NB;
+       Symmetric_key K;
+       Function pk,f
+
+Knowledge: A: A,B,pk(A),pk(B),inv(pk(A)),f;
+	   B: A,B,pk(A),pk(B),inv(pk(B)),pk,f
+
+
+
+Actions:
+B->A: B,{NB,B}pk(A)
+A->B: {f(NB),NA,A,K}pk(B)
+B->A: {|f(NA)|}K
+
+Goals:
+A *->* B: K

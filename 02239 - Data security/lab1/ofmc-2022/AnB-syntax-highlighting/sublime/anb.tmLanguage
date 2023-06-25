@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>anb</string>
+	</array>
+	<key>name</key>
+	<string>AnB</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>comment</key>
+			<string>comments</string>
+			<key>match</key>
+			<string>#.+$</string>
+			<key>name</key>
+			<string>comment.block.anb</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>builtinfunctions</string>
+			<key>match</key>
+			<string>(exp|inv)</string>
+			<key>name</key>
+			<string>storage.type.name.anb</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>keywords</string>
+			<key>match</key>
+			<string>(Protocol|Types|Agent|Number|Function|Symmetric_key|PublicKey|Knowledge|where|Actions|Goals|authenticates|on|secrecy|of|secret|between)(:?)</string>
+			<key>name</key>
+			<string>keyword.source.anb</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>constants</string>
+			<key>match</key>
+			<string>[a-z][a-zA-Z0-9_]*|[0-9]*</string>
+			<key>name</key>
+			<string>support.function.name.anb</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>hey</string>
+			<key>match</key>
+			<string>\b[A-Z_][a-zA-Z0-9_]*</string>
+			<key>name</key>
+			<string>constant.numeric.anb</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>basic keyword</string>
+			<key>match</key>
+			<string>-&gt;</string>
+			<key>name</key>
+			<string>keyword.source.anb</string>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>source.anb</string>
+	<key>uuid</key>
+	<string>4a317e23-129f-422b-917c-3273d89ec057</string>
+</dict>
+</plist>

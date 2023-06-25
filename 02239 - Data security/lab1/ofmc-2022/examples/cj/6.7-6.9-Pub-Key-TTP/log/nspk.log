@@ -1,0 +1,43 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   nspk.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 14 nodes
+  depth: 3 plies
+
+ATTACK TRACE:
+(x602,1) -> i: {NA(1),x602}_(pk(i))
+i -> (x601,1): {NA(1),x602}_(pk(x601))
+(x601,1) -> i: {NA(1),NB(2)}_(pk(x602))
+i -> (x602,1): {NA(1),NB(2)}_(pk(x602))
+(x602,1) -> i: {NB(2)}_(pk(i))
+i -> (x601,1): {NB(2)}_(pk(x601))
+
+
+% Reached State:
+% 
+% request(x601,x602,pBANA,NA(1),1)
+% secrets(NA(1),secrecyset(x601,1,pNA),i)
+% contains(secrecyset(x601,1,pNA),x602)
+% contains(secrecyset(x601,1,pNA),x601)
+% secrets(NB(2),secrecyset(x601,1,pNB),i)
+% contains(secrecyset(x601,1,pNB),x602)
+% contains(secrecyset(x601,1,pNB),x601)
+% state_rB(x601,2,inv(pk(x601)),pk,x602,NA(1),{NA(1),x602}_(pk(x601)),NB(2),{NA(1),NB(2)}_(pk(x602)),{NB(2)}_(pk(x601)),1)
+% state_rA(x602,2,i,inv(pk(x602)),pk,NA(1),{NA(1),x602}_(pk(i)),NB(2),{NA(1),NB(2)}_(pk(x602)),{NB(2)}_(pk(i)),1)
+% witness(x602,i,pBANA,NA(1))
+% witness(x601,x602,pABNB,NB(2))
+% contains(secrecyset(x602,1,pNB),i)
+% contains(secrecyset(x602,1,pNB),x602)
+% secrets(NB(2),secrecyset(x602,1,pNB),i)
+% contains(secrecyset(x602,1,pNA),i)
+% contains(secrecyset(x602,1,pNA),x602)
+% secrets(NA(1),secrecyset(x602,1,pNA),i)
+% request(x602,i,pABNB,NB(2),1)
+

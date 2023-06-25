@@ -1,0 +1,29 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   WMF.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 1 nodes
+  depth: 1 plies
+
+ATTACK TRACE:
+(x401,1) -> i: x401,{|T(1),x402,KAB(1)|}_(sk(x401,s))
+i -> (x401,1): {|T(1),x402,KAB(1)|}_(sk(x401,s))
+
+
+% Reached State:
+% 
+% wrequest(x401,x402,pBAKAB,KAB(1),i)
+% secrets(KAB(1),secrecyset(x401,1,pKAB),i)
+% contains(secrecyset(x401,1,pKAB),x402)
+% contains(secrecyset(x401,1,pKAB),x401)
+% state_rB(x401,1,pre,sk(x401,s),x402,KAB(1),T(1),{|T(1),x402,KAB(1)|}_(sk(x401,s)),1)
+% state_rs(s,0,pre,sk(x29,s),sk(x30,s),x29,x30,1)
+% state_rA(x401,1,pre,sk(x401,s),x402,T(1),KAB(1),x401,{|T(1),x402,KAB(1)|}_(sk(x401,s)),1)
+% witness(x401,x402,pBAKAB,KAB(1))
+

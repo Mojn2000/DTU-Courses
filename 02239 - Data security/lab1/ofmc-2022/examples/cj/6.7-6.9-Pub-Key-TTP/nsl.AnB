@@ -1,0 +1,18 @@
+Protocol: NSL	# Verified & Certified
+
+Types: Agent A,B;
+       Number NA,NB;
+       Function pk
+
+Knowledge: A: A,pk,inv(pk(A)),B;
+	   B: B,pk,inv(pk(B))
+
+Actions:
+A->B: {NA,A}(pk(B))
+B->A: {NA,NB,B}(pk(A))
+A->B: {NB}(pk(B))
+
+Goals:
+A *->* B: NA
+B *->* A: NB
+

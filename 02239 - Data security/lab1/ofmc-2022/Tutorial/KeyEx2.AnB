@@ -1,0 +1,27 @@
+Protocol: KeyEx
+# 2nd version: Adding encryption.
+# Problem: encryption does not include the name of the other communication partner 
+
+Types:
+  Agent A,B,s;
+  Symmetric_key KAB;
+  Function sk
+
+Knowledge:
+  A: A,B,s,sk(A,s);
+  B: A,B,s,sk(B,s);
+  s: A,B,s,sk(A,s),sk(B,s)
+
+Actions:
+
+A->s: A,B
+# s creates key KAB
+s->A: {| KAB |}sk(A,s), {| KAB |}sk(B,s)
+A->B: A,{| KAB |}sk(B,s)
+ 
+Goals: 
+
+A authenticates s on KAB,B
+B authenticates s on KAB,A
+KAB secret between A,B,s
+

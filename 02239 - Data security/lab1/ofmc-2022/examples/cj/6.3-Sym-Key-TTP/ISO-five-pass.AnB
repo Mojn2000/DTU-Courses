@@ -1,0 +1,27 @@
+Protocol: ISO5Pass
+
+# Slight problem with the association of things due to symmetry of the messages from the server to A and to B --- so B and s may have different views about the roles.
+# Not a very interesting attack, can be prevented by distinguishing the two messages of the server.
+
+Types: Agent A,B,s;
+       Number RA,RB,RB2,Text1,Text2,Text3,Text4,Text5,Text6,Text7,Text8,Text9;
+       Symmetric_key KAB;
+       Function sk
+
+Knowledge: A: A,B,s,sk(A,s);
+	   B: B,A,s,sk(B,s);
+ 	   s: A,B,s,sk(A,s),sk(B,s)
+
+Actions:
+A->B: RA,Text1
+B->s: RB2,RA,A,Text2
+s->B: Text5,{|RB2,KAB,A,Text4|}sk(B,s), 
+            {|RA, KAB,B,Text3|}sk(A,s)
+B->A: Text7,{|RA, KAB,B,Text3|}sk(A,s),
+            {|RB,RA,Text6|}KAB
+A->B: Text9,{|RA,RB,Text8|}KAB
+
+Goals:
+B authenticates s on KAB,A
+A authenticates s on KAB,B
+KAB secret between A,B,s

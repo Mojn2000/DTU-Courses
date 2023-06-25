@@ -1,0 +1,41 @@
+Protocol: CallHome
+
+Types: Agent A,b,Home;
+       Number X,Y,g,M,m1,m2,m3,m4,m5;
+       Function pw,mac
+
+Knowledge: 	A: 		A,Home,pw(A,Home),b,g,mac,m1,m2,m3,m4,m5;
+	   		b: 		b,Home,pw(b,Home),g,mac,m1,m2,m3,m4,m5;
+	   		Home: 	A,b,Home,pw,g,mac,m1,m2,m3,m4,m5
+
+Actions:
+A->b:       A,b,exp(g,X),mac(pw(A,Home),m1,A,b,exp(g,X))
+
+b->Home:	A,b,exp(g,X),mac(pw(A,Home),m1,A,b,exp(g,X)),
+			b,exp(g,X),exp(g,Y),
+			mac(pw(b,Home),m2,
+				A,b,exp(g,X),mac(pw(A,Home),m1,A,b,exp(g,X)),
+				b,exp(g,X),exp(g,Y))
+
+Home->b:	b,
+			A,
+			mac(pw(A,Home),m3,b,exp(g,X),exp(g,Y)),
+			mac(pw(b,Home),m4,b,A,exp(g,X),
+				mac(pw(A,Home),m3,b,exp(g,X),exp(g,Y)))
+
+b->A:       b,
+			A,
+			exp(g,Y),
+			mac(pw(A,Home),m3,b,exp(g,X),exp(g,Y)),
+			mac(exp(exp(g,X),Y),m5,
+			b,A,exp(g,Y),
+				mac(pw(A,Home),m3,b,exp(g,X),exp(g,Y)))
+
+A->b: {|M|}exp(exp(g,X),Y)
+
+Goals:
+b authenticates A on M
+M secret between A,b
+
+#pw(A,Home) guessable secret between A,Home
+

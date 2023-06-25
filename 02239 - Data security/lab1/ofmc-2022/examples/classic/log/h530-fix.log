@@ -1,0 +1,13 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   h530-fix.AnB
+SUMMARY:
+  NO_ATTACK_FOUND
+GOAL:
+  as specified
+DETAILS:
+  BOUNDED_NUMBER_OF_SESSIONS
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+

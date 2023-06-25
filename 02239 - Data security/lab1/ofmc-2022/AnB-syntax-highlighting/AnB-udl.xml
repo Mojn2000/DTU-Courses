@@ -1,0 +1,61 @@
+<NotepadPlus>
+    <UserLang name="AnB" ext="anb" udlVersion="2.0">
+        <Settings>
+            <Global caseIgnored="no" allowFoldOfComments="yes" forceLineCommentsAtBOL="no" foldCompact="no" />
+            <Prefix Keywords1="no" Keywords2="no" Keywords3="no" Keywords4="yes" Keywords5="yes" Keywords6="no" Keywords7="no" Keywords8="no" />
+        </Settings>
+        <KeywordLists>
+            <Keywords name="Comments" id="0">00# 01 02 03 04</Keywords>
+            <Keywords name="Numbers, additional" id="1"></Keywords>
+            <Keywords name="Numbers, prefixes" id="2"></Keywords>
+            <Keywords name="Numbers, extras with prefixes" id="3"></Keywords>
+            <Keywords name="Numbers, suffixes" id="4"></Keywords>
+            <Keywords name="Operators1" id="5">-&gt; : { { | | } } , ( ) </Keywords>
+            <Keywords name="Operators2" id="6"></Keywords>
+            <Keywords name="Folders in code1, open" id="7"></Keywords>
+            <Keywords name="Folders in code1, middle" id="8"></Keywords>
+            <Keywords name="Folders in code1, close" id="9"></Keywords>
+            <Keywords name="Folders in code2, open" id="10"></Keywords>
+            <Keywords name="Folders in code2, middle" id="11"></Keywords>
+            <Keywords name="Folders in code2, close" id="12"></Keywords>
+            <Keywords name="Folders in comment, open" id="13"></Keywords>
+            <Keywords name="Folders in comment, middle" id="14"></Keywords>
+            <Keywords name="Folders in comment, close" id="15"></Keywords>
+            <Keywords name="Keywords1" id="16">Protocol Knowledge Actions Goals Types</Keywords>
+            <Keywords name="Keywords2" id="17">Number Function&#x000A; Symmetric_key&#x000A; Public_key Agent</Keywords>
+            <Keywords name="Keywords3" id="18">where &#x000A;authenticates &#x000A;on &#x000A;secrecy secret between of</Keywords>
+            <Keywords name="Keywords4" id="19">A B C D E F G H I J K L M N O P Q R S T U V W X Z </Keywords>
+            <Keywords name="Keywords5" id="20">a b c d e f g h i j k l m n o p q r s t u v w x y z </Keywords>
+            <Keywords name="Keywords6" id="21"></Keywords>
+            <Keywords name="Keywords7" id="22"></Keywords>
+            <Keywords name="Keywords8" id="23"></Keywords>
+            <Keywords name="Delimiters" id="24"></Keywords>
+        </KeywordLists>
+        <Styles>
+            <WordsStyle name="DEFAULT" styleID="0" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="COMMENTS" styleID="1" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="LINE COMMENTS" styleID="2" fgColor="008000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="NUMBERS" styleID="3" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS1" styleID="4" fgColor="800040" bgColor="FFFFFF" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS2" styleID="5" fgColor="000080" bgColor="FFFFFF" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS3" styleID="6" fgColor="0000FF" bgColor="FFFFFF" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS4" styleID="7" fgColor="008080" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS5" styleID="8" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS6" styleID="9" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS7" styleID="10" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS8" styleID="11" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="OPERATORS" styleID="12" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN CODE1" styleID="13" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN CODE2" styleID="14" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN COMMENT" styleID="15" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS1" styleID="16" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS2" styleID="17" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS3" styleID="18" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS4" styleID="19" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS5" styleID="20" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS6" styleID="21" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS7" styleID="22" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS8" styleID="23" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+        </Styles>
+    </UserLang>
+</NotepadPlus>

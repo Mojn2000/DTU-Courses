@@ -1,0 +1,24 @@
+Protocol: Yahalom
+
+# Typeflaw attack (see [Basin, Moedersheim, Vigano 2005])
+# In typed model, replay attack (Athena)
+
+Types: Agent A,B,s;
+       Number NA,NB;
+       Symmetric_key KAB;
+       Function sk
+
+Knowledge: A: A,B,s,sk(A,s),pre;
+	   B: B,A,s,sk(B,s),pre;
+ 	   s: A,B,s,sk(A,s),sk(B,s),pre
+
+Actions:
+A->B: A,NA
+B->s: B,{|A,NA,NB|}sk(B,s)
+s->A: {|B,KAB,NA,NB|}sk(A,s),{|A,KAB|}sk(B,s)
+A->B: {|A,KAB|}sk(B,s),{|NB|}KAB
+
+Goals:
+B authenticates s on KAB,A
+A authenticates s on KAB,B
+KAB secret between A,B,s

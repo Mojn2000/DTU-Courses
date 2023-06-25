@@ -1,0 +1,24 @@
+Protocol: Carlsen # Verified & Certified
+
+# SAFE
+
+Types: Agent A,B,s;
+       Number NA,NB,NB2;
+       Symmetric_key KAB;
+       Function sk
+
+Knowledge: A: A,B,s,sk(A,s);
+	   B: B,A,s,sk(B,s);
+ 	   s: A,B,s,sk(A,s),sk(B,s)
+
+Actions:
+A->B: A,NA
+B->s: A,NA,B,NB
+s->B: {|KAB,NB,A|}sk(B,s),{|NA,B,KAB|}sk(A,s)
+B->A: {|NA,B,KAB|}sk(A,s),{|NA|}KAB,NB2
+A->B: {|NB2|}KAB
+
+Goals:
+B authenticates s on KAB,A
+A authenticates s on KAB,B
+KAB secret between A,B,s

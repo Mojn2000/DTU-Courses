@@ -1,0 +1,32 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   Woo-Lam-4.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 16 nodes
+  depth: 4 plies
+
+ATTACK TRACE:
+(x701,1) -> i: x701
+i -> (x701,1): x702
+(x701,1) -> i: NB(2)
+i -> (x701,1): NB(2)
+(x701,1) -> i: {|NB(2)|}_(sk(x701,s))
+i -> (x701,1): x506
+(x701,1) -> i: {|x702,x506|}_(sk(x701,s))
+i -> (x701,1): {|NB(2)|}_(sk(x701,s))
+
+
+% Reached State:
+% 
+% request(x701,x702,pBANB,NB(2),1)
+% state_rB(x701,3,sk(x701,s),s,x702,NB(2),x506,{|x702,x506|}_(sk(x701,s)),{|NB(2)|}_(sk(x701,s)),1)
+% state_rs(s,0,sk(x28,s),sk(x29,s),x28,x29,1)
+% state_rA(x701,2,sk(x701,s),s,x25,NB(2),{|NB(2)|}_(sk(x701,s)),1)
+% witness(x701,x25,pBANB,NB(2))
+

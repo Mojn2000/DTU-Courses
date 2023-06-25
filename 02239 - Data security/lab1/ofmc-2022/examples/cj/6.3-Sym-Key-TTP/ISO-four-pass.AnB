@@ -1,0 +1,28 @@
+Protocol: ISO4Pass
+
+# Slight problem with the association of things due to symmetry of the messages from the server to A and to B --- so B and s may have different views about the roles.
+# Not a very interesting attack, can be prevented by distinguishing the two messages of the server.
+
+# Second problem: B cannot be sure the key from the server is fresh. Thus reduced the goal to weak authentication for B. 
+
+Types: Agent A,B,s;
+       Number NA,NB,NS,TVPA,Text1,Text2,Text3,Text4,Text5,Text6,Text7;
+       Symmetric_key KAB;
+       Function sk
+
+Knowledge: A: A,B,s,sk(A,s);
+	   B: B,A,s,sk(B,s);
+ 	   s: A,B,s,sk(A,s),sk(B,s)
+
+Actions:
+A->s: TVPA,B,Text1
+s->A: Text4,{|TVPA,KAB,B,Text3|}sk(A,s), 
+            {|NS,KAB,A,Text2|}sk(B,s)
+A->B: Text6,{|NS,KAB,A,Text2|}sk(B,s),
+            {|NA,B|}KAB
+B->A: Text8,{|NB,A,Text7|}KAB
+
+Goals:
+B weakly authenticates s on KAB,A
+A authenticates s on KAB,B
+KAB secret between A,B,s

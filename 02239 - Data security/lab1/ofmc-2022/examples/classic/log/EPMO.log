@@ -1,0 +1,38 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   EPMO.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 59 nodes
+  depth: 6 plies
+
+ATTACK TRACE:
+(x902,1) -> i: one,{x902,NC(1),Goods(1),Price(1)}_(pk(x36))
+i -> (x36,1): one,{x902,NC(1),Goods(1),Price(1)}_(pk(x36))
+(x36,1) -> i: two,{NC(1),NM(2),x36,Goods(1),Price(1)}_(pk(x902))
+i -> (x902,1): two,{NC(1),NM(2),x36,Goods(1),Price(1)}_(pk(x902))
+(x902,1) -> i: three,{x902,NC(1),NM(2),Price(1)}_(pk(x901))
+i -> (x901,1): three,{x902,NC(1),NM(2),Price(1)}_(pk(x901))
+(x901,1) -> i: four,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),{NC(1),NB(4)}_(pk(x902))
+i -> (x902,1): four,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),{NC(1),NB(4)}_(pk(x902))
+(x902,1) -> i: five,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),NB(4)
+i -> (x36,1): five,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),NB(4)
+(x36,1) -> i: six,{hash(x901,NB(4),NM(2))}_inv(pk(x36))
+i -> (x901,1): six,{hash(x901,NB(4),NM(2))}_inv(pk(i))
+
+
+% Reached State:
+% 
+% request(x901,x902,pBCPriceBM,Price(1),x901,i,1)
+% state_rB(x901,2,six,five,four,three,two,one,hash,inv(pk(x901)),pk,i,x902,Price(1),NM(2),NC(1),{x902,NC(1),NM(2),Price(1)}_(pk(x901)),three,{x902,NC(1),NM(2),Price(1)}_(pk(x901)),NB(4),four,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),{NC(1),NB(4)}_(pk(x902)),x809,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),{hash(x901,NB(4),NM(2))}_inv(pk(i)),six,{hash(x901,NB(4),NM(2))}_inv(pk(i)),1)
+% state_rM(x36,2,six,five,four,three,two,one,hash,inv(pk(x36)),pk,x902,x901,Price(1),Goods(1),NC(1),{x902,NC(1),Goods(1),Price(1)}_(pk(x36)),one,{x902,NC(1),Goods(1),Price(1)}_(pk(x36)),NM(2),two,{NC(1),NM(2),x36,Goods(1),Price(1)}_(pk(x902)),x710,NB(4),{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),five,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),NB(4),six,{hash(x901,NB(4),NM(2))}_inv(pk(x36)),1)
+% state_rC(x902,3,six,five,four,three,two,one,hash,inv(pk(x902)),pk,x36,x901,NC(1),Goods(1),Price(1),one,{x902,NC(1),Goods(1),Price(1)}_(pk(x36)),x409,NM(2),{NC(1),NM(2),x36,Goods(1),Price(1)}_(pk(x902)),two,{NC(1),NM(2),x36,Goods(1),Price(1)}_(pk(x902)),three,{x902,NC(1),NM(2),Price(1)}_(pk(x901)),x611,NB(4),{NC(1),NB(4)}_(pk(x902)),hash(x902,NC(1),NB(4),NM(2),Price(1)),{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),four,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),{NC(1),NB(4)}_(pk(x902)),five,{hash(x902,NC(1),NB(4),NM(2),Price(1))}_inv(pk(x901)),NB(4),1)
+% witness(x902,x901,pBCPriceBM,Price(1),x901,x36)
+% witness(x902,x36,pMCGoodsPriceB,Goods(1),Price(1),x901)
+% request(x36,x902,pMCGoodsPriceB,Goods(1),Price(1),x901,1)
+

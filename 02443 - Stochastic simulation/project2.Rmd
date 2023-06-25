@@ -1,0 +1,526 @@
+---
+title: "Simulation project 2"
+output: pdf_document
+---
+
+## Authors
+|                            	|                                 	|                       	|
+|----------------------------	|---------------------------------	|-----------------------	|
+| Joachim Secher, s183973    	| Nicklas Bruun-Andersen, s183979 	| Gustav Als, s184400   	|
+| Mads Esben Hansen, s174434 	| Magne Egede Rasmussen, s183963  	| Peter Kampen, s183979 	|
+**Contribution table:**
+```{r, echo=FALSE}
+set.seed(329)
+name = c()
+for (i in 1:3){name = c(name, sprintf("Task %i", i))}
+data = matrix(0, nrow = 3, ncol=6)
+sample.from = c(0.5, 0.1, 0.1, 0.1, 0.3, 0.2, 0.2, 0.4)
+for (i in 1:3){
+  row = rep(0,6)
+  while (!(sum(row) >= 0.95 && sum(row) <= 1.05)){
+    row = sample(sample.from, size=6, replace = TRUE)
+  }
+  data[i,] = row
+}
+contrib = data.frame(data=data, row.names = name)
+colnames(contrib)= c("Nicklas", "Joachim", "Magne", "Gustav", "Mads", "Peter")
+print(contrib)
+```
+
+
+# Primary tasks
+## 1
+We start by building a simulation model that simulates the patient flow in the hospital as a function of the bed distribution and the mentioned parameters.
+
+To do so, we start by drawing arrival and service times for sufficiently many patients (1 years worth) for the different types of patients. 
+```{r}
+a.rates = c(14.5, 11.0, 8.0, 6.5, 5.0)
+s.rates = 1/c(2.9,4.0, 4.5, 1.4, 3.9)
+a.times <- s.times <- type <- list()  ## arrival times / service times / types
+
+set.seed(69)
+for (ii in 1:length(a.rates)) {
+  N = 1000
+  a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+  
+  while (tail(a.times[[ii]],1) < 365){
+    N = N*2
+    a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+  }
+  a.times[[ii]] = a.times[[ii]][a.times[[ii]] <= 365]
+  
+  s.times[[ii]] = rexp(n = N, rate = s.rates[ii])
+  type[[ii]] = rep(ii, length(a.times[[ii]]))
+}
+
+## unlist
+a.times = unlist(a.times)
+s.times = unlist(s.times)
+type = unlist(type)
+
+## order
+s.times = s.times[order(a.times)]
+type = type[order(a.times)]
+a.times = a.times[order(a.times)]
+
+barplot(sapply(1:5, function(i) sum(type==i)), names.arg = c("A","B","C","D","E"),
+        ylab = "Freq.", xlab = "Ward", main = "Patient types", col = 2:6)
+```
+
+We can now allocate patients iteratively to desired wards. Iff there is no more room in any ward, we follow the rules as described in the exercise, i.e., we allocate with probabilities as given in the table. If there is no room in the chosen ward for reallocation either, the patients will not be admitted at all.
+
+```{r}
+tm = t(matrix(c(0,0.05, 0.10, 0.05, 0.8, 
+       0.2, 0, 0.5, 0.15, 0.15,
+       0.3, 0.2, 0, 0.2, 0.3, 
+       0.35, 0.30, 0.05, 0, 0.3,
+       0.2, 0.1, 0.6, 0.1, 0),5,5))
+beds = c(55,40,30,20,20)
+
+allocate.patients <- function(beds, a.times, s.times, type, tm){
+    ## init variables
+    in.service = lapply(beds, function(b) rep(0, b))
+    status = matrix(NA, length(a.times), length(in.service))
+    total.block = rep(0, length(in.service))
+    re.alloc = matrix(0, length(in.service), length(in.service))
+    
+    ## Allocate patients
+    for (ii in 1:length(a.times)) {
+      if (all(a.times[ii] < in.service[[type[ii]]])){
+        try.type = sample(1:length(in.service), 1, prob = tm[type[ii], ])
+        if (all(a.times[ii] < in.service[[try.type]])){
+          ## no free beds :(
+          total.block[type[ii]] = total.block[type[ii]] + 1
+        } 
+        else {
+          in.service[[ try.type ]][ which.min( in.service[[ try.type ]] >= a.times[ii] ) ] = a.times[ii]+s.times[ii]
+          re.alloc[type[ii], try.type] = re.alloc[type[ii], try.type] + 1
+        }
+      } 
+      else {
+        in.service[[type[ii]]][ which.min( in.service[[type[ii]]] >= a.times[ii] ) ] = a.times[ii]+s.times[ii]
+      }
+      status[ii, ] = sapply(1:length(in.service), function(jj) sum(in.service[[jj]]>= a.times[ii]))
+    }
+    list(
+      status = status,
+      re.alloc = re.alloc,
+      total.block = total.block
+    )
+}
+```
+
+We can now assess how patients are distributed over times at the 5 wards.
+
+```{r}
+sol = allocate.patients(beds, a.times, s.times, type, tm)
+
+plot(a.times,sol$status[,1], type = 'l', col = 2, main = "Simulation of wards", 
+     ylab = "Patients in ward", xlab = "Time [days]")
+aux <- sapply(2:5, function(ii) lines(a.times,sol$status[,ii], col = ii+1))
+grid()
+legend('bottomright', paste("Ward", c("A","B","C","D","E")), col = 2:6, lty = 1)
+```
+
+Additionally, we can assess how people are reallocated:
+```{r}
+sol$re.alloc
+```
+Notice that especially patient of type D are reallocated to ward A, when ward D is full. Additionally, patients of type A are reallocated to ward E far more than to any of the other wards. This is consistent with the probability table given in the exercise.
+
+Finally, we can assess the distributed of people who are not admitted at all by type.
+```{r}
+sol$total.block
+```
+It seems that the type has little impact on if a patient is admitted to the hospital. Maybe there is a slight over-representation of patients of type C. 
+
+
+## 2/3
+We are now asked to create a ward F, with number of beds such that at least $95\%$ of patients of type F are allocated to ward F. 
+We immediately notice that no patients from other wards are reallocated to F. This means that F only contains patients of type F. We can therefore use Erlang-B to estimates the blocking probability. Let $m$ denote the number of beds, $\lambda$ the arrival intensity, $s$ the mean service time, and $A=\lambda \cdot s$. Let $B$ denote the blocking probability, then
+
+\[B = \frac{\frac{A^m}{m!}}{\sum_{i=0}^m \frac{A^i}{i!}}.\]
+
+We want the lowest number of beds such that $B \leq 0.05$.
+
+```{r}
+## Find number of beds in F using erlang B
+lambda = 13.0; s = 2.2; A = lambda*s
+erlang.b <- function(A,m) A^m/factorial(m) / sum(sapply(0:m, function(i) A^i / factorial(i)))
+plot(0:50, sapply(0:50, function(i) erlang.b(A,i)), type = 'l', 
+     xlab = 'Number of beds', ylab = 'Blocking probability',
+     main = "Erlang B")
+abline(h=0.05, col = "tomato", lwd = 2)
+abline(v = 34, lty = 2)
+grid()
+legend('topright', c("p=0.05", "m=34"), lty = c(1,2), col = c("tomato", 1))
+```
+We find that 
+\[m^* = \min \{ m | B(m)\leq 0.05\} = 34,\]
+
+i.e., there most be at least 34 beds in ward F. 
+
+We now want to reallocate beds optimally, maintaining the total number of beds in the hospital. To do so we use the "urgency points". We create a cost function the sums the total number of patients of type $i$ that has not been allocated to ward $i$ weigted by the urgency of ward $i$. 
+
+```{r}
+queue.cost <- function(beds) {
+  in.service = lapply(beds, function(b) rep(0, b))
+  cost = 0
+  for (ii in 1:length(a.times)) {
+    if (all(a.times[ii] < in.service[[type[ii]]])){
+      cost = cost + ifelse(type[ii]!=6, urgency[type[ii]], 0)
+      try.type = sample(1:length(in.service), 1, prob = tm[type[ii], ])
+      if (all(a.times[ii] < in.service[[try.type]])){
+        ## no free beds :(
+      } 
+      else {
+        in.service[[ try.type ]][ which.min( in.service[[ try.type ]] >= a.times[ii] ) ] = a.times[ii]+s.times[ii]
+      }
+    } 
+    else {
+      in.service[[type[ii]]][ which.min( in.service[[type[ii]]] >= a.times[ii] ) ] = a.times[ii]+s.times[ii]
+    }
+  }
+  cost
+}
+```
+
+We can now use simulated annealing to optimize the distribution of beds according to the urgency points.
+
+```{r}
+a.rates = c(14.5, 11.0, 8.0, 6.5, 5.0, 13.0)
+s.rates = 1/c(2.9,4.0, 4.5, 1.4, 3.9, 2.2)
+urgency = c(7,5,2,10,5)
+a.times <- s.times <- type <- list()  ## arrival times / service times / types
+
+set.seed(69)
+for (ii in 1:length(a.rates)) {
+  N = 1000
+  a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+  while (tail(a.times[[ii]],1) < 365){
+    N = N*2
+    a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+  }
+  a.times[[ii]] = a.times[[ii]][a.times[[ii]] <= 365]
+  s.times[[ii]] = rexp(n = N, rate = s.rates[ii])
+  type[[ii]] = rep(ii, length(a.times[[ii]]))
+}
+
+## unlist
+a.times = unlist(a.times)
+s.times = unlist(s.times)
+type = unlist(type)
+
+## order
+s.times = s.times[order(a.times)]
+type = type[order(a.times)]
+a.times = a.times[order(a.times)]
+
+tm = t(matrix(c(0,0.05, 0.10, 0.05, 0.8, 0,
+                0.2, 0, 0.5, 0.15, 0.15, 0,
+                0.3, 0.2, 0, 0.2, 0.3, 0,
+                0.35, 0.30, 0.05, 0, 0.3, 0,
+                0.2, 0.1, 0.6, 0.1, 0, 0,
+                0.2, 0.2, 0.2, 0.2, 0.2, 0),6,6))
+T.fun <- function(k){
+  1/sqrt(1+k)
+}
+optim.queue <- function(beds0, fun, N) {
+  ## init route
+  beds = matrix(NA,nrow = N, ncol = length(beds0))
+  cost = length(beds0)
+  beds[1,] = beds0
+  cost[1] = fun(beds0)
+  
+  for (ii in 2:N) {
+    # propose route
+    beds.new = beds[ii-1, ]
+    while ( (!any(beds[ii-1, ] != beds.new)) && all(beds.new>0) ){
+      beds.new = beds[ii-1, ]
+      idx = sample(1:5,2, replace = F)
+      beds.new[idx[1]] = beds.new[idx[1]] - 1
+      beds.new[idx[2]] = beds.new[idx[2]] + 1
+    }
+    c0 = fun(beds[ii-1,])
+    c1 = fun(beds.new)
+    ## accept/reject
+    beds[ii, ] = `if`( c1<c0 || (exp(-(c1 - c0)/T.fun(ii))>runif(1)), 
+                        beds.new, beds[ii-1, ])
+    cost[ii] = c1
+    #print(ii)
+  }
+  list(beds = beds,
+       cost = cost)
+}
+
+if (file.exists('sim.optim.beds.rds')){
+  sim.beds = readRDS('sim.optim.beds.rds')
+} else{
+  sim.beds = optim.queue(c(31,30,30,20,20,34), queue.cost, 600)
+  saveRDS(sim.beds,
+        'sim.optim.beds.rds')
+}
+```
+
+```{r}
+plot(sim.beds$cost, main = 'Simulated annealing', 
+     ylab = 'Urgency cost')
+grid()
+opt.bed = sim.beds$beds[which.min(sim.beds$cost), ]
+print(paste('Optimal bed distribution: ', paste(opt.bed, collapse = ' ') ))
+
+barplot(rbind(c(beds, 0), opt.bed), density = 100, col = 2:3, beside = T,
+        names.arg = c("A","B","C","D","E","F"), 
+        main = 'Distributed of beds', ylab = 'Beds', xlab = 'Ward')
+grid()
+legend('topright', c('Before', 'After'), pch = 15, col = 2:3)
+
+```
+We see that the simulated annealing seems to converge after $\sim 300$ iterations. Notice that due to the generic stochasticity in the reallocation of patient, there is some generic noice in the cost function - even with the same distribution of beds. 
+We see that ward A and B are large unchanged, ward C and E are basically closed and the number of beds in ward D is almost doubled! Looking at the urgency points, we see that ward D has the highest urgency, it therefore makes sense that the number of beds in this ward in particular is increased. 
+
+
+# Primary performance measures 
+## 1
+We start by estimating the probability that all beds are occupied on arrival, the expected number of admissions, and the expected number of relocated patients for each ward in the hospital. 
+To perform the estimates, we draw $\kappa$ 1 year samples, and from each of these estimate the desired parameters. Via the CLT we can then assume these estimates to follow a normal distributed. 
+
+We start by assuming that ward F does not exist.
+```{r}
+a.rates = c(14.5, 11.0, 8.0, 6.5, 5.0)
+s.rates = 1/c(2.9,4.0, 4.5, 1.4, 3.9)
+tm = t(matrix(c(0,0.05, 0.10, 0.05, 0.8, 
+         0.2, 0, 0.5, 0.15, 0.15,
+         0.3, 0.2, 0, 0.2, 0.3, 
+         0.35, 0.30, 0.05, 0, 0.3,
+         0.2, 0.1, 0.6, 0.1, 0),5,5))
+beds = c(55,40,30,20,20)
+kappa = 20
+b.total <- e.admin <- all.occ <- rep(NA, kappa)
+alloc.total = matrix(NA, kappa, length(beds))
+set.seed(69)
+for (ll in 1:kappa) {
+  a.times <- s.times <- type <- list()  ## arrival times / service times / types
+  for (ii in 1:length(a.rates)) {
+    N = 1000
+    a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+    while (tail(a.times[[ii]],1) < 365){
+      N = N*2
+      a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+    }
+    a.times[[ii]] = a.times[[ii]][a.times[[ii]] <= 365]
+    s.times[[ii]] = rexp(n = N, rate = s.rates[ii])
+    type[[ii]] = rep(ii, length(a.times[[ii]]))
+  }
+  a.times = unlist(a.times)
+  s.times = unlist(s.times)
+  type = unlist(type)
+  s.times = s.times[order(a.times)]
+  type = type[order(a.times)]
+  a.times = a.times[order(a.times)]
+  
+  sol = allocate.patients(beds, a.times, s.times, type, tm)
+  
+  all.occ[ll] = sum(apply(sol$status, 1, function(X) sum(X)==165)) / length(a.times) 
+  b.total[ll] = sum(sol$total.block) / length(a.times)
+  alloc.total[ll, ] = apply(sol$re.alloc, 1, sum)
+  e.admin[ll] = length(a.times) - sum(sol$total.block)
+}
+
+print('Probability that all beds are occupied:' )
+print(mean(all.occ) + qt(0.975, df = kappa)*sd(all.occ)/sqrt(kappa)*c(-1,1))
+
+print('Probability of not being admitted:' )
+print(mean(b.total) + qt(0.975, df = kappa)*sd(b.total)/sqrt(kappa)*c(-1,1))
+
+
+print('Reallocations from ward:' )
+wards = c('A', 'B', 'C', 'D', 'E', 'F')
+for (i in 1:ncol(alloc.total)) {
+  print(paste('Ward', wards[i]))
+  print(mean(alloc.total[,i]) + qt(0.975, df = kappa)*sd(alloc.total[,i])/sqrt(kappa)*c(-1,1))  
+}
+
+print('Expected number of admission (1st year)')
+print(mean(e.admin) + qt(0.975, df = kappa)*sd(e.admin)/sqrt(kappa)*c(-1,1))  
+```
+
+## 2
+We can now assess the relocation of the patients with respect to the urgency points. Specifically, we can assess the expected contribution to a cost based on weigthed contributions from each ward.
+
+```{r}
+apply(alloc.total, 2, mean)*urgency
+```
+
+We see that the contribution from ward D to the total urgency cost is much larger than the rest. This indicates that it would be a good idea to reallocate beds to ward D. Since patients are reallocated based on a probability matrix, the system is quite complex - it is therefore difficult to determine exactly what the optimal re-distribution would be. As shown earlier, simulated annealing would be a way of getting a estimate. 
+
+## 3
+We now repeat when F is included. We use distribution of beds found by means of simulated annealing, i.e., something close to the optimal distribution of beds. 
+
+```{r}
+a.rates = c(14.5, 11.0, 8.0, 6.5, 5.0, 13.0)
+s.rates = 1/c(2.9,4.0, 4.5, 1.4, 3.9, 2.2)
+tm = t(matrix(c(0,0.05, 0.10, 0.05, 0.8, 0,
+                0.2, 0, 0.5, 0.15, 0.15, 0,
+                0.3, 0.2, 0, 0.2, 0.3, 0,
+                0.35, 0.30, 0.05, 0, 0.3, 0,
+                0.2, 0.1, 0.6, 0.1, 0, 0,
+                0.2, 0.2, 0.2, 0.2, 0.2, 0),6,6))
+beds = opt.bed
+kappa = 20
+b.total <- e.admin <- all.occ <- rep(NA, kappa)
+alloc.total = matrix(NA, kappa, length(beds))
+set.seed(69)
+for (ll in 1:kappa) {
+  a.times <- s.times <- type <- list()  ## arrival times / service times / types
+  for (ii in 1:length(a.rates)) {
+    N = 1000
+    a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+    while (tail(a.times[[ii]],1) < 365){
+      N = N*2
+      a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+    }
+    a.times[[ii]] = a.times[[ii]][a.times[[ii]] <= 365]
+    s.times[[ii]] = rexp(n = N, rate = s.rates[ii])
+    type[[ii]] = rep(ii, length(a.times[[ii]]))
+  }
+  a.times = unlist(a.times)
+  s.times = unlist(s.times)
+  type = unlist(type)
+  s.times = s.times[order(a.times)]
+  type = type[order(a.times)]
+  a.times = a.times[order(a.times)]
+  
+  sol = allocate.patients(beds, a.times, s.times, type, tm)
+  
+  all.occ[ll] = sum(apply(sol$status, 1, function(X) sum(X)==165)) / length(a.times) 
+  b.total[ll] = sum(sol$total.block) / length(a.times)
+  alloc.total[ll, ] = apply(sol$re.alloc, 1, sum)
+  e.admin[ll] = length(a.times) - sum(sol$total.block)
+}
+
+print('Probability that all beds are occupied:' )
+print(mean(all.occ) + qt(0.975, df = kappa)*sd(all.occ)/sqrt(kappa)*c(-1,1))
+
+print('Probability of not being admitted:' )
+print(mean(b.total) + qt(0.975, df = kappa)*sd(b.total)/sqrt(kappa)*c(-1,1))
+
+
+print('Reallocations from ward:' )
+wards = c('A', 'B', 'C', 'D', 'E', 'F')
+for (i in 1:ncol(alloc.total)) {
+  print(paste('Ward', wards[i]))
+  print(mean(alloc.total[,i]) + qt(0.975, df = kappa)*sd(alloc.total[,i])/sqrt(kappa)*c(-1,1))  
+}
+
+print('Expected number of admission (1st year)')
+print(mean(e.admin) + qt(0.975, df = kappa)*sd(e.admin)/sqrt(kappa)*c(-1,1))  
+```
+We see a quite dramatic increase in probability of not being admitted at all. In fact, we go from a probability of $[0.053 \quad 0.058]$ to $[0.209 \quad 0.234]$. 
+For this part, it does not make sense to assess the urgency points, since we have already used simulated annealing to optimize this and since we do not have the urgency for ward F.
+
+# Sensitivity analysis
+## 1
+We now test the system’s sensitivity to the length-of-stay distribution by replacing the exponential distribution with the log-normal distribution. We test the new distribution by gradually increasing the variance. Specifically, we use
+
+\[\sigma_i^2 = \frac{k}{\mu_i^2}, \quad k \in \{1,2,...,5\}.\]
+
+Since we modify the variance, we also need to re-compute the $\mu$ parameter, $\mu^*$, to ensure the same mean, i.e.,
+
+\[\mu_i^* = \log(1/\mu_i) - \frac{\sigma_i^2}{2}.\]
+
+```{r}
+if (file.exists('varSens.rds')){
+  aux = readRDS('varSens.rds')
+  beds.block.all = aux[[1]]
+  choice.first.all = aux[[2]]
+  beds.block.sum.all = aux[[3]]
+  choice.first.sum.all = aux[[4]]
+} else{
+  beds.org = c(55,40,30,20,20)
+  a.rates = c(14.5, 11.0, 8.0, 6.5, 5.0)
+  s.rates = 1/c(2.9,4.0, 4.5, 1.4, 3.9)
+  a.times <- s.times <- type <- list()  ## arrival times / types
+  
+  permutations = 1:5
+  beds.block.allo = array(0, c(length(permutations), 100, length(beds.org)))
+  beds.block.all = array(0, c(length(permutations), 100, length(beds.org)))
+  beds.block.sum.all = array(0, c(length(permutations), 100, 1))
+  choice.first.all = array(0, c(length(permutations), 100, length(beds.org)))
+  choice.first.sum.all = array(0, c(length(permutations), 100, 1))
+  set.seed(1)
+  for (perm in permutations){
+  print(sprintf("perm = %i", perm))
+    for (bi in 1:100){
+          print(sprintf("     b = %i", bi))
+          beds = beds.org
+          
+          beds.block.allo[perm, bi, ] = beds
+          
+          ii = 1
+          a.times <- s.times <- type <- list() 
+          for (ii in 1:length(a.rates)) {
+            N = 10000
+            a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+            
+            while (tail(a.times[[ii]],1) < 365){
+              N = N*2
+              a.times[[ii]] = cumsum(rexp(n = N, rate = a.rates[ii]))
+            }
+            a.times[[ii]] = a.times[[ii]][a.times[[ii]] <= 365]
+            
+            s.times[[ii]] = rlnorm(n = N, meanlog = log(1/s.rates[ii])-perm/(2*(1/s.rates[ii])^2), 
+                                  sdlog = sqrt(perm/(1/s.rates[ii])^2))
+            type[[ii]] = rep(ii, length(a.times[[ii]]))
+          }
+          
+          
+          ## unlist
+          a.times = unlist(a.times)
+          s.times = unlist(s.times)
+          type = unlist(type)
+          
+          ## order
+          s.times = s.times[order(a.times)]
+          type = type[order(a.times)]
+          a.times = a.times[order(a.times)]
+          
+          tm = t(matrix(c(0,0.05, 0.10, 0.05, 0.8, 
+                          0.2, 0, 0.5, 0.15, 0.15,
+                          0.3, 0.2, 0, 0.2, 0.3, 
+                          0.35, 0.30, 0.05, 0, 0.3,
+                          0.2, 0.1, 0.6, 0.1, 0),5,5))
+          
+          sol = allocate.patients(beds, a.times, s.times, type, tm)
+          
+          beds.block.all[perm, bi, ] = sol$total.block
+          choice.first.all[perm, bi, ] = sapply(1:length(beds), function(i) sum(type==i)) - rowSums(sol$re.alloc)
+          beds.block.sum.all[perm, bi, 1] = sum(sol$total.block)
+          choice.first.sum.all[perm, bi, 1] = sum(choice.first.all[perm, bi, ])
+      }
+  }
+  
+  saveRDS(object = list(beds.block.all,
+            choice.first.all,
+            beds.block.sum.all,
+            choice.first.sum.all),
+          file = 'varSens.rds')
+}
+
+```
+
+We can now assess the number of people not admitted to the hospital as a function of variance in service time.
+```{r}
+plasma.colors.16 = viridis::viridis(5)
+beds.df = as.data.frame(beds.block.sum.all)
+rownames(beds.df) = permutations
+boxplot(t(beds.df),col=plasma.colors.16, xlab="k", ylab="No. blocked patients", main="Blocking rate sensitivity to variance of log-normal service times")
+```
+Overall, we see that the variance in the service time, i.e., time spent in hospital, does not have a large effect on the number of patients not admitted (deduced directly from the plot). We previously saw, with the introduction of Erlang-B, that the blocking probability is independent on the distribution of the service time (only depends on the mean service time). Therefore, it is not particularly suprising that we see no difference here. 
+
+
+
+
+
+
+

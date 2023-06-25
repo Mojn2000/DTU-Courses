@@ -1,0 +1,23 @@
+Protocol: NSLKeyServer # Verified
+
+Types: Agent A,B,s;
+       Number NA,NB;
+       Function pk
+
+Knowledge: A: A,pk(A),inv(pk(A)),s,pk(s),B;
+	   B: B,pk(B),inv(pk(B)),s,pk(s);
+	   s: s,pk,inv(pk(s))
+
+Actions:
+A->s: A,B
+s->A: {B,pk(B)}(inv(pk(s)))
+A->B: {NA,A}(pk(B))
+B->s: B,A
+s->B: {A,pk(A)}(inv(pk(s)))
+B->A: {NA,NB,B}(pk(A))
+A->B: {NB}(pk(B))
+
+Goals:
+A *->* B: NA
+B *->* A: NB
+

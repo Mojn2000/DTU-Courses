@@ -1,0 +1,40 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   SSO.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  secrets
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 47 nodes
+  depth: 5 plies
+
+ATTACK TRACE:
+(x305,1) -> i: pseudonym(x305),{|x305,i,URI(1)|}_(secChCr(pseudonym(x305),i))
+i -> (x305,1): i,{|x305,x305,x306|}_(secChCr(i,x305))
+(x305,1) -> i: {|x305,idp,x305,ID(2),x306|}_(secChCr(x305,i))
+i -> (x305,1): {|x305,idp,i,x505,URI(1)|}_(secChCr(i,pseudonym(x305)))
+(x305,1) -> i: {|x305,idp,i,x505,URI(1)|}_(secChCr(x305,idp))
+i -> (idp,1): {|x305,idp,i,x505,URI(1)|}_(secChCr(x305,idp))
+(idp,1) -> i: {|{x305,idp}_inv(pk(idp)),URI(1)|}_(secChCr(idp,x305))
+i -> (x305,1): {|{x305,idp}_inv(pk(idp)),URI(1)|}_(secChCr(idp,x305))
+(x305,1) -> i: pseudonym(x305),{|{x305,idp}_inv(pk(idp)),URI(1)|}_(secChCr(pseudonym(x305),i))
+i -> (x305,1): i,{|{x305,idp}_inv(pk(idp)),x306|}_(secChCr(i,x305))
+(x305,1) -> i: {|Data(6),ID(2)|}_(secChCr(x305,i))
+i -> (i,17): Data(6)
+i -> (i,17): Data(6)
+
+
+% Reached State:
+% 
+% secrets(Data(6),secrecyset(x305,1,pData),i)
+% witness(x305,x305,pCSPData,Data(6))
+% request(x305,x305,pSPCURI,x306,1)
+% state_rSP(x305,2,pk(idp),idp,x306,x305,x305,x305,x306,i,ID(2),x305,idp,x305,ID(2),x306,{x305,idp}_inv(pk(idp)),{x305,idp}_inv(pk(idp)),x306,Data(6),Data(6),ID(2),1)
+% contains(secrecyset(x305,1,pData),x305)
+% state_ridp(idp,1,inv(pk(idp)),pk(idp),x305,URI(1),x505,i,x305,idp,i,x505,URI(1),{x305,idp}_inv(pk(idp)),URI(1),1)
+% state_rC(x305,3,pk(idp),i,idp,URI(1),x305,i,URI(1),x505,x305,idp,i,x505,URI(1),{x305,idp}_inv(pk(idp)),{x305,idp}_inv(pk(idp)),URI(1),1)
+% witness(x305,i,pSPCURI,URI(1))
+

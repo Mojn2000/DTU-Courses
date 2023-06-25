@@ -1,0 +1,39 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   Woo-Lam-Mutual.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 30 nodes
+  depth: 5 plies
+
+ATTACK TRACE:
+(x801,1) -> i: x801,NA(1)
+i -> (x801,1): i,NA(1)
+(x801,1) -> i: x801,NB(2)
+i -> (x801,1): i,NB(2)
+(x801,1) -> i: {|x801,i,NA(1),NB(2)|}_(sk(x801,s))
+i -> (x801,1): x507
+(x801,1) -> i: x507,{|i,x801,NA(1),NB(2)|}_(sk(x801,s))
+i -> (s,1): {|i,x801,NA(1),NB(2)|}_(sk(i,s)),{|i,x801,NA(1),NB(2)|}_(sk(x801,s))
+(s,1) -> i: {|x801,NA(1),NB(2),KAB(5)|}_(sk(i,s)),{|i,NA(1),NB(2),KAB(5)|}_(sk(x801,s))
+i -> (x801,1): {|i,NA(1),NB(2),KAB(5)|}_(sk(x801,s)),{|NA(1),NB(2)|}_KAB(5)
+(x801,1) -> i: {|NB(2)|}_KAB(5)
+
+
+% Reached State:
+% 
+% request(x801,s,pAsKABB,KAB(5),i,1)
+% state_rA(x801,3,sk(x801,s),s,i,NA(1),x801,NA(1),NB(2),i,NB(2),{|x801,i,NA(1),NB(2)|}_(sk(x801,s)),{|NA(1),NB(2)|}_KAB(5),KAB(5),{|i,NA(1),NB(2),KAB(5)|}_(sk(x801,s)),{|i,NA(1),NB(2),KAB(5)|}_(sk(x801,s)),{|NA(1),NB(2)|}_KAB(5),{|NB(2)|}_KAB(5),1)
+% secrets(KAB(5),secrecyset(x801,1,pKAB),i)
+% contains(secrecyset(x801,1,pKAB),x801)
+% contains(secrecyset(x801,1,pKAB),i)
+% state_rB(x801,2,sk(x801,s),s,i,NA(1),i,NA(1),NB(2),x801,NB(2),x507,x507,{|i,x801,NA(1),NB(2)|}_(sk(x801,s)),1)
+% state_rs(s,1,sk(x801,s),sk(i,s),x801,i,{|i,x801,NA(1),NB(2)|}_(sk(x801,s)),NB(2),NA(1),{|i,x801,NA(1),NB(2)|}_(sk(i,s)),{|i,x801,NA(1),NB(2)|}_(sk(i,s)),{|i,x801,NA(1),NB(2)|}_(sk(x801,s)),KAB(5),{|x801,NA(1),NB(2),KAB(5)|}_(sk(i,s)),{|i,NA(1),NB(2),KAB(5)|}_(sk(x801,s)),1)
+% witness(s,i,pAsKABB,KAB(5),x801)
+% witness(s,x801,pBsKABA,KAB(5),i)
+

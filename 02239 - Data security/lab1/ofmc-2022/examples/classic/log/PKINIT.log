@@ -1,0 +1,32 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   PKINIT.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 13 nodes
+  depth: 4 plies
+
+ATTACK TRACE:
+(x701,1) -> i: x701,g,N1(1),{T0(1),N1(1),hash(x701,g,N1(1))}_inv(pk(x701))
+i -> (ath,1): i,g,N1(1),{x306,N1(1),hash(i,g,N1(1))}_inv(pk(i))
+(ath,1) -> i: i,{|ath,i,g,KCG(2),T1(2)|}_skag,{|g,KCG(2),T1(2),N1(1)|}_Ktemp(2),{tag,{Ktemp(2)}_inv(pk(ath))}_(pk(i))
+i -> (x701,1): x701,x405,{|g,KCG(2),T1(2),N1(1)|}_Ktemp(2),{tag,{Ktemp(2)}_inv(pk(ath))}_(pk(x701))
+(x701,1) -> i: s,N2(3),x405,{|x701,T1(2)|}_KCG(2)
+i -> (x701,1): x701,x510,{|s,x511,x512,N2(3)|}_KCG(2)
+(x701,1) -> i: x510,{|x701,hash(x512)|}_x511
+i -> (x701,1): {|hash(x512)|}_x511,{|tag,x613|}_x511
+
+
+% Reached State:
+% 
+% request(x701,s,pCsPayload,x613,1)
+% state_rC(x701,4,pk,tag,hash,inv(pk(x701)),pk(x701),pk(ath),s,g,ath,N1(1),T0(1),x701,g,N1(1),{T0(1),N1(1),hash(x701,g,N1(1))}_inv(pk(x701)),x405,T1(2),KCG(2),{|g,KCG(2),T1(2),N1(1)|}_Ktemp(2),{T0(1),N1(1),hash(x701,g,N1(1))}_inv(pk(x701)),Ktemp(2),{Ktemp(2)}_inv(pk(ath)),{tag,{Ktemp(2)}_inv(pk(ath))}_(pk(x701)),x701,x405,{|g,KCG(2),T1(2),N1(1)|}_Ktemp(2),{tag,{Ktemp(2)}_inv(pk(ath))}_(pk(x701)),N2(3),s,N2(3),x405,{|x701,T1(2)|}_KCG(2),x510,{|x701,T1(2)|}_KCG(2),x512,x511,{|s,x511,x512,N2(3)|}_KCG(2),x701,x510,{|s,x511,x512,N2(3)|}_KCG(2),x510,{|x701,hash(x512)|}_x511,{|x701,hash(x512)|}_x511,x613,{|tag,x613|}_x511,{|hash(x512)|}_x511,{|hash(x512)|}_x511,{|tag,x613|}_x511,1)
+% state_rg(g,0,tag,hash,skgs,skag,ath,1)
+% state_rs(s,0,tag,hash,skgs,g,1)
+% state_rath(ath,1,tag,skag,hash,inv(pk(ath)),pk(ath),pk(i),g,i,hash(i,g,N1(1)),N1(1),x306,{x306,N1(1),hash(i,g,N1(1))}_inv(pk(i)),i,g,N1(1),{x306,N1(1),hash(i,g,N1(1))}_inv(pk(i)),KCG(2),T1(2),Ktemp(2),i,{|ath,i,g,KCG(2),T1(2)|}_skag,{|g,KCG(2),T1(2),N1(1)|}_Ktemp(2),{tag,{Ktemp(2)}_inv(pk(ath))}_(pk(i)),1)
+

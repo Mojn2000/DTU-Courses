@@ -1,0 +1,26 @@
+Protocol: KeyEx
+# Naive first version without encryption
+
+Types:
+  Agent A,B,s;
+  Symmetric_key KAB;
+  Function sk
+
+Knowledge:
+  A: A,B,s,sk(A,s);
+  B: A,B,s,sk(B,s);
+  s: A,B,s,sk(A,s),sk(B,s)
+
+Actions:
+
+A->s: A,B
+# s creates key KAB
+s->A: KAB
+A->B: A,KAB
+ 
+Goals: 
+
+A authenticates s on KAB,B
+B authenticates s on KAB,A
+KAB secret between A,B,s
+

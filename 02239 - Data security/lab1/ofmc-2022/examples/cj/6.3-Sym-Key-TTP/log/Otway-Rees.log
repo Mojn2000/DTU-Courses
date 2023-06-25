@@ -1,0 +1,29 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   Otway-Rees.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 1 nodes
+  depth: 1 plies
+
+ATTACK TRACE:
+(x401,1) -> i: M(1),x401,x25,{|NA(1),M(1),x401,x25|}_(sk(x401,s))
+i -> (x401,1): M(1),{|NA(1),M(1),x401,x25|}_(sk(x401,s))
+
+
+% Reached State:
+% 
+% request(x401,s,pAsKAB,M(1),x401,x25,1)
+% secrets(M(1),x401,x25,secrecyset(x401,1,pKAB),i)
+% contains(secrecyset(x401,1,pKAB),x401)
+% contains(secrecyset(x401,1,pKAB),x25)
+% contains(secrecyset(x401,1,pKAB),s)
+% state_rA(x401,2,sk(x401,s),x25,M(1),NA(1),M(1),x401,x25,{|NA(1),M(1),x401,x25|}_(sk(x401,s)),{|NA(1),M(1),x401,x25|}_(sk(x401,s)),M(1),x401,x25,{|NA(1),M(1),x401,x25|}_(sk(x401,s)),M(1),{|NA(1),M(1),x401,x25|}_(sk(x401,s)),1)
+% state_rB(x26,0,sk(x26,s),x27,1)
+% state_rs(s,0,sk(x28,s),sk(x29,s),x28,x29,1)
+

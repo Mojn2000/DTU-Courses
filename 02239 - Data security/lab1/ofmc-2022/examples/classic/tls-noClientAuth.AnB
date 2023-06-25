@@ -1,0 +1,34 @@
+Protocol: TLS_noClientAuth  # Bounded-verified
+
+# variant without client certificate 
+# and the weakened goal to establish a secure channel wiht [A] 
+
+Types: Agent A,B,s;
+       Number NA,NB,Sid,PA,PB,PMS;
+       Function pk,hash,clientK,serverK,prf
+
+Knowledge: 
+A: A,pk(A),pk(s),inv(pk(A)),{A,pk(A)}inv(pk(s)),B,hash,clientK,serverK,prf;
+B: B,pk(B),pk(s),inv(pk(B)),{B,pk(B)}inv(pk(s)),hash,clientK,serverK,prf
+
+Actions:
+
+[A]*->B: A,NA,Sid,PA
+B->A: NB,Sid,PB,{B,pk(B)}inv(pk(s))
+A->B: # no client certificate
+      {PMS}pk(B),
+      hash(NB,B,PMS),
+      {|hash(prf(PMS,NA,NB),A,B,NA,NB,Sid,PA,PB,PMS)|}
+        clientK(NA,NB,prf(PMS,NA,NB))
+B->A: {|hash(prf(PMS,NA,NB),A,B,NA,NB,Sid,PA,PB,PMS)|}
+        serverK(NA,NB,prf(PMS,NA,NB))
+
+Goals:
+
+ [A] *->* B : prf(PMS,NA,NB)
+ B *->* [A] : prf(PMS,NA,NB)
+
+
+
+
+

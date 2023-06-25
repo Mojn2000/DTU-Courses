@@ -1,0 +1,27 @@
+Protocol: NSCK # Needham Schroeder with Conventional Keys # Verified & Certified
+
+# The protocol suffers from a replay attack (see also amended NSCK and
+# Denning Sacco). We verify here that it satisfies weak authentication
+# and secrecy.  Note that, due to the formaluation of goals in the
+# abstractions, we cannot formulate goals directly with respect to the
+# key KAB here.
+
+Types: Agent A,B,s;
+       Number NA,NB,NB2;
+       Symmetric_key KAB;
+       Function sk,pre
+
+Knowledge: A: A,B,sk(A,s),pre;
+	   B: B,A,sk(B,s),pre;
+ 	   s: A,B,sk(A,s),sk(B,s),pre
+
+Actions:
+A->s: A,B,NA
+s->A: {|NA,B,KAB,{|KAB,A|}sk(B,s)|}sk(A,s)
+A->B: {|KAB,A|}sk(B,s)
+B->A: {|NB|}KAB
+A->B: {|pre(NB)|}KAB
+
+Goals:
+B *->* A: NB
+B weakly authenticates A on NB

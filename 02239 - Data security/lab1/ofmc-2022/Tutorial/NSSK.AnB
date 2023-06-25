@@ -1,0 +1,31 @@
+Protocol: NSSK
+# The Needham-Schroeder Shared-Key Protocol 
+# Problem: if a key is broken, the challenge-response can still be replayed
+# OFMC finds a replay attack in case of a dishonest A (not very interesting)
+ 
+Types:
+  Agent A,B,s;
+  Number NA,NB;
+  Symmetric_key KAB;
+  Function sk,pre
+
+Knowledge:
+  A: A,B,s,sk(A,s),pre;
+  B: A,B,s,sk(B,s),pre;
+  s: A,B,s,sk(A,s),sk(B,s),pre
+
+Actions:
+
+A->s: A,B,NA
+# s creates key KAB
+s->A: {| KAB,B,NA, {| KAB,A |}sk(B,s)  |}sk(A,s)
+A->B: {| KAB,A |}sk(B,s)
+B->A: {| NB |}KAB
+A->B: {| pre(NB) |}KAB
+ 
+Goals: 
+
+A authenticates s on KAB,B
+B authenticates s on KAB,A
+KAB secret between A,B,s
+

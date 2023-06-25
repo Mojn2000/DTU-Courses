@@ -1,0 +1,25 @@
+Protocol: OtwayRees # Flawed
+
+# has a type-flaw attack in the --untyped model
+# in the typed model, there is a relatively stupid replay attack if A=B is allowed
+# we exclude this by A!=B
+
+Types: Agent A,B,s;
+       Number NA,NB,M;
+       Symmetric_key KAB
+
+Knowledge: A: A,B,sk(A,s);
+	   B: B,A,sk(B,s);
+ 	   s: A,B,sk(A,s),sk(B,s)
+where A!=B
+
+Actions:
+A->B: M,A,B,{|NA,M,A,B|}sk(A,s)
+B->s: M,A,B,{|NA,M,A,B|}sk(A,s),{|NB,M,A,B|}sk(B,s)
+s->B: M,{|NA,KAB|}sk(A,s),{|NB,KAB|}sk(B,s)
+B->A: M,{|NA,KAB|}sk(A,s)
+
+Goals:
+B authenticates s on KAB
+A authenticates s on KAB
+KAB secret between A,B,s

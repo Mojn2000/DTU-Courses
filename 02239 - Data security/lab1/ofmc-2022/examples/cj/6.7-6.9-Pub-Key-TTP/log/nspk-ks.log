@@ -1,0 +1,42 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   nspk-ks.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  secrecy
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 88 nodes
+  depth: 6 plies
+
+ATTACK TRACE:
+(x902,1) -> i: x902,i
+i -> (s,1): x902,i
+(s,1) -> i: {i,pk(i)}_inv(pk(s))
+i -> (x902,1): {i,pk(i)}_inv(pk(s))
+(x902,1) -> i: {NA(3),x902}_(pk(i))
+i -> (s,1): i,x902
+(s,1) -> i: {x902,pk(x902)}_inv(pk(s))
+i -> (x902,1): {NA(3),x902}_(pk(x902))
+(x902,1) -> i: x902,x902
+i -> (x902,1): {x902,pk(x902)}_inv(pk(s))
+(x902,1) -> i: {NA(3),NB(6)}_(pk(x902))
+i -> (x902,1): {NA(3),NB(6)}_(pk(x902))
+(x902,1) -> i: {NB(6)}_(pk(i))
+i -> (i,17): NB(6)
+i -> (i,17): NB(6)
+
+
+% Reached State:
+% 
+% secret(NB(6),x902)
+% witness(x902,x902,pABNB,NB(6))
+% secret(NA(3),i)
+% witness(x902,i,pBANA,NA(3))
+% state_rs(s,2,inv(pk(s)),pk,i,x902,x902,i,{i,pk(i)}_inv(pk(s)),i,x902,{x902,pk(x902)}_inv(pk(s)),1)
+% state_rB(x902,2,pk(s),s,inv(pk(x902)),pk(x902),x902,NA(3),{NA(3),x902}_(pk(x902)),x902,x902,pk(x902),{x902,pk(x902)}_inv(pk(s)),NB(6),{NA(3),NB(6)}_(pk(x902)),1)
+% request(x902,i,pABNB,NB(6),1)
+% state_rA(x902,3,i,pk(s),s,inv(pk(x902)),pk(x902),x902,i,pk(i),{i,pk(i)}_inv(pk(s)),NA(3),{NA(3),x902}_(pk(i)),NB(6),{NA(3),NB(6)}_(pk(x902)),{NB(6)}_(pk(i)),1)
+

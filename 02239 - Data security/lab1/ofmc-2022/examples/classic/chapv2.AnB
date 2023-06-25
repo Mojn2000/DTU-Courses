@@ -1,0 +1,20 @@
+Protocol: PW # Simplification of Microsofts Chap v2
+
+Types: Agent A,B; 
+       Number NB;
+       Function pw,h;
+
+Knowledge:
+
+A: A,B,pw(A,B),h;
+B: A,B,pw(A,B),h; 
+
+Actions:
+
+B->A: NB
+A->B: h(pw(A,B),NB)
+Goals:
+
+B authenticates A on NB
+pw(A,B) guessable secret between A,B
+

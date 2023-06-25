@@ -1,0 +1,20 @@
+Protocol: WMF
+
+# simple reflection attack
+
+Types: Agent A,B,s;
+       Number NA,NB,NB2;
+       Symmetric_key KAB;
+       Function sk,pre
+
+Knowledge: A: A,B,sk(A,s),pre;
+	   B: B,A,sk(B,s),pre;
+ 	   s: A,B,sk(A,s),sk(B,s),pre
+
+Actions:
+A->s: A,{|T,B,KAB|}sk(A,s)
+s->B: {|T,A,KAB|}sk(B,s)
+
+Goals:
+B weakly authenticates A on KAB
+KAB secret between A,B

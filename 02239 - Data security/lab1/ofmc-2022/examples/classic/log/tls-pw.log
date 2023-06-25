@@ -1,0 +1,15 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   tls-pw.AnB
+SUMMARY:
+  NO_ATTACK_FOUND
+GOAL:
+  as specified
+DETAILS:
+  BOUNDED_NUMBER_OF_SESSIONS
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 960 nodes
+  depth: 10 plies
+

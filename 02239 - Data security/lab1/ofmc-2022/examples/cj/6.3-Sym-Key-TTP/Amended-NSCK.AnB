@@ -1,0 +1,22 @@
+Protocol: AmendedNSCK # Verified
+
+Types: Agent A,B,s;
+       Number NA,NB,NB0;
+       Symmetric_key KAB;
+       Function sk,pre
+
+Knowledge: A: A,B,sk(A,s),pre;
+	   B: B,A,sk(B,s),pre;
+ 	   s: A,B,sk(A,s),sk(B,s),pre
+
+Actions:
+A->B: A
+B->A: {|A,NB0|}sk(B,s)
+A->s: A,B,NA,{|A,NB0|}sk(B,s)
+s->A: {|NA,B,KAB,{|KAB,NB0,A|}sk(B,s)|}sk(A,s)
+A->B: {|KAB,NB0,A|}sk(B,s)
+B->A: {|NB|}KAB
+A->B: {|pre(NB)|}KAB
+
+Goals:
+B *->* A: NB

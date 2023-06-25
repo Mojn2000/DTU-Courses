@@ -1,0 +1,35 @@
+Protocol: WooLam92 # Verified
+
+# Protocol from Woo and Lam, has stupid attacks if B=s or A=B is allowed.
+# Also the original version has the problem that in the signed message from the server, the name of A is not mentioned which leads to a secrecy problem
+# with a parallel session attack. Here the fixed version and the bugged one in comments.
+
+Types: Agent A,B,s;
+       Number NA,NB;
+       Symmetric_key KS;
+       Function pk
+
+Knowledge: A: A,pk(A),inv(pk(A)),s,pk(s),B;
+	   B: A,B,pk(B),inv(pk(B)),s,pk(s);
+	   s: s,A,B,pk(A),pk(B),pk(s),inv(pk(s))
+where B!=s, A!=B
+
+Actions:
+A->s: A,B
+s->A: {B,pk(B)}(inv(pk(s)))
+A->B: {NA,A}(pk(B))
+B->s: A,B,{NA}pk(s)
+
+# Fixed version; for the bugged version replace the following two lines:
+s->B: {A,pk(A)}(inv(pk(s))), { {NA,KS,B,A}inv(pk(s)) }pk(B)
+B->A: {{NA,KS,B,A}inv(pk(s)),NB}pk(A)
+# with these two commented lines:
+# s->B: {A,pk(A)}(inv(pk(s))), { {NA,KS,B}inv(pk(s)) }pk(B)
+# B->A: {{NA,KS,B}inv(pk(s)),NB}pk(A)
+
+A->B: {|NB|}KS
+
+Goals:
+A authenticates s on KS,B
+B authenticates s on KS,A
+KS secret between A,B,s

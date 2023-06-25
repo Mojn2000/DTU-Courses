@@ -1,0 +1,30 @@
+Protocol: KeyEx
+# 5th version: the correction of NSSK suggested by Denning-Sacco
+# Problem: same role confusion as in version 3
+
+Types:
+  Agent A,B,s;
+  Number NA,NB;
+  Symmetric_key KAB;
+  Function sk,pre
+
+Knowledge:
+  A: A,B,s,sk(A,s),pre;
+  B: A,B,s,sk(B,s),pre;
+  s: A,B,s,sk(A,s),sk(B,s),pre
+
+Actions:
+
+# B creates NB
+B->A: A,B,NB
+A->s: A,B,NA,NB
+# s creates key KAB
+s->A: {| KAB,B,NA |}sk(A,s), {| KAB,A,NB |}sk(B,s)
+A->B: {| KAB,A,NB |}sk(B,s)
+ 
+Goals: 
+
+A authenticates s on KAB,B
+B authenticates s on KAB,A
+KAB secret between A,B,s
+

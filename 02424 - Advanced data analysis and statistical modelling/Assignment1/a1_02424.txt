@@ -1,0 +1,15 @@
+Problem A
+	Ex1
+		From cor plot we propose 3 models:
+			1: insulation = outdoor_temp
+			2: insulation_sex = outdoor_temp
+			3: insulation_sex = outdoor_temp + indoor_temp
+
+
+Quesiton to Jan:
+What exactly is meant by "weighted analysis???" Seems to be wls, but how do you want that???
+How are we supposed to plot conf intervals in 3d???
+
+
+
+	

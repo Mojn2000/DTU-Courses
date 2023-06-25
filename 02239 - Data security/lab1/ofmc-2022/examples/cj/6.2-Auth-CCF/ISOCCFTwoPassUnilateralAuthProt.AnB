@@ -1,0 +1,16 @@
+Protocol: ISO_twopass_CCF # Verified
+
+Types: Agent A,B;
+       Number NB,Text1,Text2,Text3;
+       Function sk,f
+
+Knowledge: A: A,B,sk(A,B),f;
+	   B: B,A,sk(A,B),f
+
+Actions:
+B->A: NB
+A->B: f(sk(A,B),NB,B,Text2),NB,B,Text2
+
+Goals:
+A *-> B: Text2
+

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+DIRS="\
+cj/6.1-Sym-Key-no-TTP \
+cj/6.2-Auth-CCF \
+cj/6.3-Sym-Key-TTp \
+cj/6.6-Pub-Key-no-TTP \
+cj/6.7-6.9-Pub-Key-TTP \
+classic/
+"
+
+for dir in $DIRS;
+do
+  pushd $dir
+  for i in `ls *\.AnB`
+  do
+    echo $i
+
+    ISVERIFIED=`grep \#\ Verified $i`
+    ISBOUNDEDVERIFIED=`grep \#\ Bounded-verified $i`
+    UNTYPED=`grep "\-\-untyped" $i`
+    if [ "$ISVERIFIED" = "" ] 
+    then
+       if [ "$ISBOUNDEDVERIFIED" = "" ] 
+       then
+         OPT="--classic"
+       else
+	 OPT="--classic --numSess 2"
+       fi
+       if [ "$UNTYPED" != "" ]
+       then 
+	   OPT=$OPT' --untyped'
+       fi
+       LOG=${i%AnB}log
+    else
+       OPT="--fp --of Isa"
+       LOG=${i%AnB}fp
+    fi
+
+    ofmc $i $OPT | \
+         grep -E -v 'searchTime|Version|parseTime|TIME' \
+         > $LOG
+
+    if [ -f log/$LOG ]
+    then
+	DIFF=`diff --brief $LOG log/$LOG`
+	if [ "$DIFF" = "" ] 
+	then 
+	    rm $LOG
+	else 
+	    echo "********* Deviation on" $i
+	    diff $LOG log/$LOG  # > log/diff-$LOG
+	    mv $LOG log/new-$LOG
+	fi
+    else
+	echo "Log does not exist, creating."
+	if [ ! -d log ]
+	then
+	    mkdir log
+	fi
+	mv $LOG log
+    fi
+
+  done;
+  popd
+done

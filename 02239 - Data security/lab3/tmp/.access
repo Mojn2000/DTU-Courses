@@ -1,0 +1,10 @@
+start:Bob
+stop:Bob
+restart:Bob, Cecilia
+status:Bob
+print:Cecilia, David, Erica, Fred, George
+queue:Cecilia, David, Erica, Fred, George
+topQueue:Cecilia
+readConfig:Bob
+setConfig:Bob
+all:Alice, usr0

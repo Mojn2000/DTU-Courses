@@ -1,0 +1,23 @@
+Installation:
+
+Note that there are executables for Windows, Mac, and Linux! You only
+need to compile from source if these do not work or you want to modify
+OFMC.
+
+For compiling from source, you need Haskell/ghc (haskell.com) with the
+tools Alex and Happy which are now part of all standard
+installations. Also, a new modification by Jakub Janaszkiewicz uses
+the parallel package to speed up search which is usually not included
+in most distributions.
+
+You can install it with  "cabal install --lib parallel"
+
+Compilation should now work with just running "make" in the src
+directory.
+
+If there are problems with the parallel library, one can always resort
+to the old search by replacing "Search.hs" with "Search-classic.hs" as
+a last resort.
+
+Have fun!
+Feedback: samo@dtu.dk

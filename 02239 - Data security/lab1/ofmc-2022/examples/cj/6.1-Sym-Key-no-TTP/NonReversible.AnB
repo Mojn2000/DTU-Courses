@@ -1,0 +1,18 @@
+Protocol: NonReversible # Verified & Certified
+
+Types: Agent A,B;
+       Number NA,NB;
+       Symmetric_key K;
+       Function sk,f
+
+Knowledge: A: A,B,sk(A,B),f;
+	   B: B,A,sk(A,B),f
+
+Actions:
+B->A: B,NB
+A->B: A,{|f(NB),NA,A,K|}sk(A,B)
+B->A: B,{|f(NA)|}K
+
+Goals:
+A *->* B: NA
+B *-> A: NB

@@ -1,0 +1,60 @@
+// The generated lexer module will start with this code
+{
+module CalculatorLexer
+open Microsoft.FSharp.Text.Lexing
+// open the module that defines the tokens
+open CalculatorParser
+}
+
+// We define macros for some regular expressions we will use later
+let digit       = ['0'-'9']
+//let num       = ('+'|'-')? digit+ ( '.' digit+)?  ('E' ('+'|'-')? digit+ )?
+let num         = digit+ ( '.' digit+)?  ('E' ('+'|'-')? digit+ )?
+let whitespace  = [' ' '\t']
+let newline     = "\n\r" | '\n' | '\r'
+let letter		= (['a'-'z'] | ['A'-'Z'])
+let var			= (letter)(letter | digit | '_')*
+
+// We define now the rules for recognising and building tokens
+// for each of the tokens of our language we need a rule
+rule tokenize = parse
+// deal with tokens that need to be ignored (skip them)
+| whitespace    { tokenize lexbuf }
+| newline       { lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf; }
+// deal with tokens that need to be built
+	
+| '*'           { TIMES }
+| '/'           { DIV }
+| '+'           { PLUS }
+| '-'           { MINUS }
+| '^'           { POW }
+| "sqrt"		{ SQRT }
+| '('           { LPAR }
+| ')'           { RPAR }
+| eof           { EOF } // Arithmetic until here
+| '&'			{ CON }
+| "&&"			{ SCON }
+| '|'			{ DIS }
+| "||"			{ SDIS }
+| '!'			{ NEG }
+| "=="			{ EQ }
+| "!="			{ NEQ }
+| ">"			{ LGT }
+| ">="			{ LGET }
+| "<"			{ RGT }
+| "<="			{ RGET }
+| "true"		{ TRUE }
+| "false"		{ FALSE } // Boolean until here
+| ":="			{ ASSIGN }
+| "skip"		{ SKIP }
+| ';'			{ SEP }
+| "if"			{ IF }
+| "fi"			{ FI }
+| "do"			{ DO }
+| "od"			{ OD } // Commands until here
+| "->"			{ WHILE }
+| "[]"			{ OR } // Guard Commands until here
+| num           { NUM(float(System.String.Concat(LexBuffer<_>.LexemeString lexbuf))) }
+| var			{ VAR(System.String.Concat(LexBuffer<_>.LexemeString lexbuf))}
+
+

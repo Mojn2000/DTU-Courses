@@ -1,0 +1,28 @@
+Open-Source Fixedpoint Model-Checker version 2020
+INPUT:
+   AndrewSecureRPC.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 8 nodes
+  depth: 3 plies
+
+ATTACK TRACE:
+(x601,1) -> i: x601,{|NA(1)|}_(sk(x601,x602))
+i -> (x602,1): x601,{|NA(1)|}_(sk(x601,x602))
+(x602,1) -> i: {|succ(NA(1)),NB(2)|}_(sk(x601,x602))
+i -> (x601,1): {|succ(NA(1)),NB(2)|}_(sk(x601,x602))
+(x601,1) -> i: {|succ(NB(2))|}_(sk(x601,x602))
+i -> (x601,1): {|NA(1)|}_(sk(x601,x602))
+
+
+% Reached State:
+% 
+% request(x601,x602,pABNB2,NA(1),1)
+% state_rA(x601,3,succ,sk(x601,x602),x602,NA(1),x601,{|NA(1)|}_(sk(x601,x602)),{|NA(1)|}_(sk(x601,x602)),NB(2),succ(NA(1)),{|succ(NA(1)),NB(2)|}_(sk(x601,x602)),{|succ(NB(2))|}_(sk(x601,x602)),NA(1),{|NA(1)|}_(sk(x601,x602)),1)
+% state_rB(x602,1,succ,sk(x601,x602),x601,NA(1),{|NA(1)|}_(sk(x601,x602)),x601,{|NA(1)|}_(sk(x601,x602)),NB(2),{|succ(NA(1)),NB(2)|}_(sk(x601,x602)),1)
+

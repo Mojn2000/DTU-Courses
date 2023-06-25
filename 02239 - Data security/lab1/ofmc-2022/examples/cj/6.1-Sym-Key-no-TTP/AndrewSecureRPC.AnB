@@ -1,0 +1,20 @@
+Protocol: Andrew_Secure_RPC
+
+# Has a reflection attack
+# Secrecy holds, though, see ...Secret.AnB
+
+Types: Agent A,B;
+       Number NA,NB,NB2;
+       Function sk,succ
+
+Knowledge: A: A,B,sk(A,B),succ;
+	   B: B,A,sk(A,B),succ
+
+Actions:
+A->B: A,{|NA|}sk(A,B)
+B->A: {|succ(NA),NB|}sk(A,B)
+A->B: {|succ(NB)|}sk(A,B)
+B->A: {|NB2|}sk(A,B)
+
+Goals:
+B *->* A: NB2

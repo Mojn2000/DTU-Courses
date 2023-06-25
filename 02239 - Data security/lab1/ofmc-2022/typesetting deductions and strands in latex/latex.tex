@@ -1,0 +1,56 @@
+\documentclass{article}
+\usepackage{amsmath,proof}
+\usepackage{xypic}
+
+\newcommand{\crypt}[2]{\{#2\}_{#1}}
+\newcommand{\scrypt}[2]{\{\!| #2 |\!\}_{#1}}
+\newcommand{\inv}[1]{\iffont{inv}(#1)}
+\newcommand{\pair}[2]{\langle #1, #2 \rangle}
+\newcommand{\iffont}[1]{\mathsf{#1}}
+
+\begin{document}
+
+\section*{Dolev-Yao Derivations}
+
+\begin{displaymath}
+  \infer[(\mathit{Compose})]{M\vdash \scrypt{k_1}{\pair{m_1}{m_2}}}{
+    \infer[(\mathit{Axiom})]{M\vdash k_1}{} &
+    \infer[(\mathit{Compose})]{M\vdash \pair{m_1}{m_2}}{
+      \infer[(\mathit{DecSym})]{M\vdash m_1}{
+        \infer[(\mathit{Axiom})]{M\vdash\scrypt{k_1}{m_1}}{} &
+        \infer[(\mathit{Axiom})]{M\vdash k_1}{}
+      } &
+      \infer[(\mathit{Axiom})]{M\vdash m_2}{}
+    }
+  }
+\end{displaymath}
+
+\section*{Strands}
+
+% Strands with the xypic-package:
+% I use for instance:
+% *+[F]{A} to set "A" in a box
+% \ar@{=}[d] to create a double line down
+% \ar@{->}[rr] to create a single arrow line two steps right
+% Note that an xymatrix is like an array and if you draw arrows to 
+% array fields that don't exist, you get strange error messages...
+
+\begin{displaymath}
+  \xymatrix{
+    *+[F]{A}\ar@{=}[d]\\
+    \bullet\ar@{=}[d]\ar@{->}[rr]^{\crypt{pk({i})}{n17,a}} &&\\
+    \bullet\ar@{=}[d] &&
+    \ar@{->}[ll]_{\crypt{pk({ a})}{n17,\mathit{NB}}}\\
+    \bullet\ar@{->}[rr]^{\crypt{pk(i)}{\mathit{NB}}} &&      
+  }
+  ~~  
+  \xymatrix{
+    && *+[F]{B}\ar@{=}[d]\\
+    \ar@{->}[rr]^{\crypt{pk(b)}{\mathit{NA},a}} && \bullet\ar@{=}[d]\\
+    && \bullet\ar@{=}[d] 
+    \ar@{->}[ll]_{\crypt{pk(a)}{\mathit{NA},n18}}\\
+    \ar@{->}[rr]^{\crypt{pk(b)}{n18}} && \bullet     
+  }
+\end{displaymath}
+
+\end{document}

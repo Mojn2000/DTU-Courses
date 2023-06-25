@@ -1,0 +1,58 @@
+Open-Source Fixedpoint Model-Checker version 2020
+Verified for 1 sessions
+INPUT:
+   yahalom.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  strong_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 552 nodes
+  depth: 5 plies
+
+ATTACK TRACE:
+i -> (x801,1): i,x506
+(x801,1) -> i: x801,{|i,x506,NB(1)|}_(sk(x801,s))
+i -> (x801,2): i,x406
+(x801,2) -> i: x801,{|i,x406,NB(2)|}_(sk(x801,s))
+i -> (s,1): x801,{|i,x406,NB(2)|}_(sk(x801,s))
+(s,1) -> i: {|x801,KAB(3),x406,NB(2)|}_(sk(i,s)),{|i,KAB(3)|}_(sk(x801,s))
+i -> (s,2): x801,{|i,x506,NB(1)|}_(sk(x801,s))
+(s,2) -> i: {|x801,KAB(4),x506,NB(1)|}_(sk(i,s)),{|i,KAB(4)|}_(sk(x801,s))
+i -> (x801,1): {|i,KAB(4)|}_(sk(x801,s)),{|NB(1)|}_KAB(4)
+i -> (x801,2): {|i,KAB(4)|}_(sk(x801,s)),{|NB(2)|}_KAB(4)
+
+
+% Reached State:
+% 
+% request(x801,s,pBsKABA,KAB(4),i,2)
+% request(x801,s,pBsKABA,KAB(4),i,1)
+% secrets(KAB(4),secrecyset(x801,2,pKAB),i)
+% contains(secrecyset(x801,2,pKAB),i)
+% contains(secrecyset(x801,2,pKAB),x801)
+% contains(secrecyset(x801,2,pKAB),s)
+% state_rB(x801,2,pre,sk(x801,s),s,i,x406,i,x406,NB(2),x801,{|i,x406,NB(2)|}_(sk(x801,s)),{|i,x406,NB(2)|}_(sk(x801,s)),{|NB(2)|}_KAB(4),KAB(4),{|i,KAB(4)|}_(sk(x801,s)),{|i,KAB(4)|}_(sk(x801,s)),{|NB(2)|}_KAB(4),2)
+% state_rs(s,1,pre,sk(x801,s),sk(i,s),x801,i,NB(1),x506,{|i,x506,NB(1)|}_(sk(x801,s)),x801,{|i,x506,NB(1)|}_(sk(x801,s)),KAB(4),{|x801,KAB(4),x506,NB(1)|}_(sk(i,s)),{|i,KAB(4)|}_(sk(x801,s)),2)
+% state_rA(x20,0,pre,sk(x20,s),s,x26,1)
+% state_rs(s,1,pre,sk(x801,s),sk(i,s),x801,i,NB(2),x406,{|i,x406,NB(2)|}_(sk(x801,s)),x801,{|i,x406,NB(2)|}_(sk(x801,s)),KAB(3),{|x801,KAB(3),x406,NB(2)|}_(sk(i,s)),{|i,KAB(3)|}_(sk(x801,s)),1)
+% state_rB(x801,2,pre,sk(x801,s),s,i,x506,i,x506,NB(1),x801,{|i,x506,NB(1)|}_(sk(x801,s)),{|i,x506,NB(1)|}_(sk(x801,s)),{|NB(1)|}_KAB(4),KAB(4),{|i,KAB(4)|}_(sk(x801,s)),{|i,KAB(4)|}_(sk(x801,s)),{|NB(1)|}_KAB(4),1)
+% state_rA(x31,0,pre,sk(x31,s),s,x33,2)
+% contains(secrecyset(s,1,pKAB),s)
+% contains(secrecyset(s,1,pKAB),x801)
+% contains(secrecyset(s,1,pKAB),i)
+% secrets(KAB(3),secrecyset(s,1,pKAB),i)
+% witness(s,i,pAsKABB,KAB(3),x801)
+% witness(s,x801,pBsKABA,KAB(3),i)
+% contains(secrecyset(s,2,pKAB),s)
+% contains(secrecyset(s,2,pKAB),x801)
+% contains(secrecyset(s,2,pKAB),i)
+% secrets(KAB(4),secrecyset(s,2,pKAB),i)
+% witness(s,i,pAsKABB,KAB(4),x801)
+% witness(s,x801,pBsKABA,KAB(4),i)
+% contains(secrecyset(x801,1,pKAB),s)
+% contains(secrecyset(x801,1,pKAB),x801)
+% contains(secrecyset(x801,1,pKAB),i)
+% secrets(KAB(4),secrecyset(x801,1,pKAB),i)
+

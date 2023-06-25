@@ -1,0 +1,37 @@
+Open-Source Fixedpoint Model-Checker version 2020
+Verified for 1 sessions
+INPUT:
+   Denning-Sacco.AnB
+SUMMARY:
+  ATTACK_FOUND
+GOAL:
+  weak_auth
+BACKEND:
+  Open-Source Fixedpoint Model-Checker version 2020
+STATISTICS:
+  visitedNodes: 120 nodes
+  depth: 4 plies
+
+ATTACK TRACE:
+(x702,1) -> i: x702,i
+i -> (s,1): x701,x702
+(s,1) -> i: {x701,pk(x701)}_inv(pk(s)),{x702,pk(x702)}_inv(pk(s))
+i -> (s,2): i,x702
+(s,2) -> i: {i,pk(i)}_inv(pk(s)),{x702,pk(x702)}_inv(pk(s))
+i -> (x702,1): {x702,pk(x702)}_inv(pk(s)),{i,pk(i)}_inv(pk(s))
+(x702,1) -> i: {x702,pk(x702)}_inv(pk(s)),{i,pk(i)}_inv(pk(s)),{{KAB(4),NA(4)}_inv(pk(x702)),tag}_(pk(i))
+i -> (x701,1): {x702,pk(x702)}_inv(pk(s)),{x701,pk(x701)}_inv(pk(s)),{{KAB(4),NA(4)}_inv(pk(x702)),tag}_(pk(x701))
+
+
+% Reached State:
+% 
+% request(x701,x702,pBAKAB,KAB(4),1)
+% state_rB(x701,1,tag,inv(pk(x701)),pk(x701),pk(s),NA(4),KAB(4),{KAB(4),NA(4)}_inv(pk(x702)),{{KAB(4),NA(4)}_inv(pk(x702)),tag}_(pk(x701)),{x701,pk(x701)}_inv(pk(s)),pk(x702),x702,{x702,pk(x702)}_inv(pk(s)),{x702,pk(x702)}_inv(pk(s)),{x701,pk(x701)}_inv(pk(s)),{{KAB(4),NA(4)}_inv(pk(x702)),tag}_(pk(x701)),1)
+% state_rs(s,1,tag,inv(pk(s)),pk(s),pk(x702),pk(x701),x702,x701,x701,x702,{x701,pk(x701)}_inv(pk(s)),{x702,pk(x702)}_inv(pk(s)),1)
+% state_rA(x702,2,tag,pk(s),inv(pk(x702)),pk(x702),i,x702,i,pk(i),{i,pk(i)}_inv(pk(s)),{x702,pk(x702)}_inv(pk(s)),{x702,pk(x702)}_inv(pk(s)),{i,pk(i)}_inv(pk(s)),KAB(4),NA(4),{x702,pk(x702)}_inv(pk(s)),{i,pk(i)}_inv(pk(s)),{{KAB(4),NA(4)}_inv(pk(x702)),tag}_(pk(i)),1)
+% state_rA(x30,0,tag,pk(s),inv(pk(x30)),pk(x30),x32,2)
+% state_rB(x33,0,tag,inv(pk(x33)),pk(x33),pk(s),2)
+% state_rs(s,1,tag,inv(pk(s)),pk(s),pk(x702),pk(i),x702,i,i,x702,{i,pk(i)}_inv(pk(s)),{x702,pk(x702)}_inv(pk(s)),2)
+% witness(x702,i,pBAKAB,KAB(4))
+% secret(KAB(4),i)
+

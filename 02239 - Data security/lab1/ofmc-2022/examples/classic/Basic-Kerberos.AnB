@@ -1,0 +1,30 @@
+Protocol: Basic_Kerberos  # Bounded-verified
+
+Types: Agent C,a,g,s;
+       Number N1,N2,T1,T2,T3,Payload,tag;
+       Function hash,sk;
+       Symmetric_key KCG,KCS
+
+Knowledge: C: C,a,g,s,sk(C,a),hash,tag;
+	   a: a,g,hash,C,sk(C,a),sk(a,g),tag;
+	   g: a,g,sk(a,g),sk(g,s),hash,tag;
+	   s: g,s,sk(g,s),hash,tag
+
+Actions:
+
+C -> a: C,g,N1
+a -> C: {| KCG, C, T1 |} sk(a,g), 
+        {| KCG, N1, T1, G |} sk(C,a)
+C -> g: {| KCG, C, T1 |} sk(a,g), 
+	{|C,T1|}KCG,
+        s,N2
+g -> C: {| KCS, C, T2 |}sk(g,s),
+	{| KCS, N2, T2, s |}KCG
+C -> s: {| KCS, C, T2 |}sk(g,s),
+        {| C, T3 |}KCS
+s -> C: {|T3|}KCS, {|tag,Payload|}KCS
+
+Goals:
+s *->* C: Payload
+
+

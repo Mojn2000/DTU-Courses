@@ -1,0 +1,26 @@
+Protocol: NSPK
+
+Types: Agent A,B;
+       Number NA,NB;
+       Function pk
+
+Knowledge: A: A,pk,inv(pk(A)),B;
+	   B: B,pk,inv(pk(B))
+
+Actions:
+# A creates NA
+A->B: {NA,A}(pk(B))
+# B creates NB
+B->A: {NA,NB}(pk(A))
+A->B: {NB}(pk(B))
+
+Goals:
+
+B authenticates A on NA
+A authenticates B on NB
+NA secret between A,B
+NB secret between A,B
+
+# As channel goals (note secrecy is a strictly weaker goal here)
+#A *->* B: NA
+#B *->* A: NB

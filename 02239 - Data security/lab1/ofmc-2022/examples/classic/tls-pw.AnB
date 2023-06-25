@@ -1,0 +1,34 @@
+Protocol: TLS_pw  # Bounded-verified
+
+# variant without client certificate
+# and using a guessable password to authenticate the client
+
+Types: Agent A,B,s;
+       Number NA,NB,Sid,PA,PB,PMS;
+       Function pk,hash,clientK,serverK,prf,pw
+
+Knowledge: 
+A: A,pk(s),B,hash,clientK,serverK,prf,pw(A,B);
+B: B,A,pk(B),pk(s),inv(pk(B)),{B,pk(B)}inv(pk(s)),hash,clientK,serverK,prf,pw(A,B)
+
+Actions:
+
+A->B: A,NA,Sid,PA
+B->A: NB,Sid,PB,{B,pk(B)}inv(pk(s))
+A->B: {PMS}pk(B),
+      hash(NB,B,PMS),
+      {|hash(prf(PMS,NA,NB),A,B,NA,NB,Sid,PA,PB,PMS),   pw(A,B)  |}
+        clientK(NA,NB,prf(PMS,NA,NB))
+B->A: {|hash(prf(PMS,NA,NB),A,B,NA,NB,Sid,PA,PB,PMS)|}
+        serverK(NA,NB,prf(PMS,NA,NB))
+Goals:
+
+B authenticates A on prf(PMS,NA,NB)
+A authenticates B on prf(PMS,NA,NB)
+prf(PMS,NA,NB) secret between A,B
+pw(A,B) guessable secret between A,B
+
+
+
+
+

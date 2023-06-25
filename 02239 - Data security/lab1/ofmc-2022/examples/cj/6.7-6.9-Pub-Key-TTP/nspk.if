@@ -1,0 +1,105 @@
+section types:
+i,A,B,A11,B11,B21,AnB_A,AnB_B:agent
+A,B:agent
+NA,NB:text
+pk:function
+
+section inits:
+ initial_state init1 :=
+state_rA(A11,2,0,B11,inv(apply(pk,A11)),pk).
+state_rB(B21,2,0,inv(apply(pk,B21)),pk).
+iknows(i).
+iknows(0).
+iknows(B11).
+iknows(inv(apply(pk,i))).
+iknows(pk).
+iknows(SID).
+iknows(confChCr).
+iknows(authChCr).
+iknows(inv(apply(authChCr,i))).
+iknows(inv(apply(confChCr,i))).
+iknows(apply(secChCr,pair(i,A11))).
+iknows(apply(secChCr,pair(i,B11))).
+iknows(apply(secChCr,pair(i,B21))).
+iknows(apply(secChCr,pair(A11,i))).
+iknows(apply(secChCr,pair(B11,i))).
+iknows(apply(secChCr,pair(B21,i))).
+iknows(apply(secChCr,pair(i,apply(pseudonym,A11)))).
+iknows(apply(secChCr,pair(i,apply(pseudonym,B11)))).
+iknows(apply(secChCr,pair(i,apply(pseudonym,B21)))).
+iknows(apply(secChCr,pair(apply(pseudonym,A11),i))).
+iknows(apply(secChCr,pair(apply(pseudonym,B11),i))).
+iknows(apply(secChCr,pair(apply(pseudonym,B21),i))) & A11/=i & B21/=i
+
+section rules:
+step trans0:=
+state_rA(A,SID,0,B,inv(apply(pk,A)),pk)
+=[exists NA]=>
+witness(A,B,pBANA,NA).
+state_rA(A,SID,1,B,inv(apply(pk,A)),pk,NA,crypt(apply(pk,B),pair(NA,A))).
+iknows(crypt(apply(pk,B),pair(NA,A)))
+
+step trans1:=
+state_rB(B,SID,0,inv(apply(pk,B)),pk).
+iknows(crypt(apply(pk,B),pair(NA,A)))
+=[exists NB]=>
+witness(B,A,pABNB,NB).
+state_rB(B,SID,1,inv(apply(pk,B)),pk,A,NA,crypt(apply(pk,B),pair(NA,A)),NB,crypt(apply(pk,A),pair(NA,NB))).
+iknows(crypt(apply(pk,A),pair(NA,NB)))
+
+step trans2:=
+state_rA(A,SID,1,B,inv(apply(pk,A)),pk,NA,crypt(apply(pk,B),pair(NA,A))).
+iknows(crypt(apply(pk,A),pair(NA,NB)))
+=>
+request(A,B,pABNB,NB,SID).
+secrets(NA,apply(secrecyset,pair(A,pair(SID,pNA)))).
+contains(apply(secrecyset,pair(A,pair(SID,pNA))),A).
+contains(apply(secrecyset,pair(A,pair(SID,pNA))),B).
+secrets(NB,apply(secrecyset,pair(A,pair(SID,pNB)))).
+contains(apply(secrecyset,pair(A,pair(SID,pNB))),A).
+contains(apply(secrecyset,pair(A,pair(SID,pNB))),B).
+state_rA(A,SID,2,B,inv(apply(pk,A)),pk,NA,crypt(apply(pk,B),pair(NA,A)),NB,crypt(apply(pk,A),pair(NA,NB)),crypt(apply(pk,B),NB)).
+iknows(crypt(apply(pk,B),NB))
+
+step trans3:=
+state_rB(B,SID,1,inv(apply(pk,B)),pk,A,NA,crypt(apply(pk,B),pair(NA,A)),NB,crypt(apply(pk,A),pair(NA,NB))).
+iknows(crypt(apply(pk,B),NB))
+=>
+request(B,A,pBANA,NA,SID).
+secrets(NA,apply(secrecyset,pair(B,pair(SID,pNA)))).
+contains(apply(secrecyset,pair(B,pair(SID,pNA))),A).
+contains(apply(secrecyset,pair(B,pair(SID,pNA))),B).
+secrets(NB,apply(secrecyset,pair(B,pair(SID,pNB)))).
+contains(apply(secrecyset,pair(B,pair(SID,pNB))),A).
+contains(apply(secrecyset,pair(B,pair(SID,pNB))),B).
+state_rB(B,SID,2,inv(apply(pk,B)),pk,A,NA,crypt(apply(pk,B),pair(NA,A)),NB,crypt(apply(pk,A),pair(NA,NB)),crypt(apply(pk,B),NB))
+
+section attack_states:
+  attack_state secrecy :=
+    secret(AnB_M,AnB_A).
+    iknows(AnB_M)
+    & AnB_A/=i
+
+  attack_state weak_auth :=
+    request(AnB_A,AnB_B,AnB_PURP,AnB_MSG,SID)
+    & not(witness(AnB_B,AnB_A,AnB_PURP,AnB_MSG))
+    & AnB_B/=i
+    & AnB_A/=AnB_B
+
+  attack_state weak_auth :=
+    wrequest(AnB_A,AnB_B,AnB_PURP,AnB_MSG)
+    & not(witness(AnB_B,AnB_A,AnB_PURP,AnB_MSG))
+    & AnB_B/=i
+    & AnB_A/=AnB_B
+
+  attack_state strong_auth :=
+    request(AnB_A,AnB_B,AnB_PURP,AnB_MSG,SID).
+    request(AnB_A,AnB_B,AnB_PURP,AnB_MSG,SID2)
+    & SID/=SID2
+    & AnB_B/=i
+    & AnB_A/=AnB_B
+
+  attack_state secrets :=
+    secrets(AnB_M,AnB_SET).
+    iknows(AnB_M)
+    & not(contains(AnB_SET,i))
