@@ -10,6 +10,7 @@ To explore the homework assignments, you can simply clone this repository using 
 
 ```bash
 git clone https://github.com/your-username/repository-name.git
+```
 
 Make sure you have Git installed on your system.
 
