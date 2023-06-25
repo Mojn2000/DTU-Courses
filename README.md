@@ -4,16 +4,6 @@ Welcome to my repository of master's degree homework assignments! This collectio
 
 Disclaimer: **Please note that the solutions provided in this repository are for reference and learning purposes only. Submitting these solutions as your own may violate academic integrity policies. There are no guarantees of correctness, and I encourage you to understand the concepts and solve the assignments on your own.**
 
-## Getting Started
-
-To explore the homework assignments, you can simply clone this repository using the following command:
-
-```bash
-git clone https://github.com/your-username/repository-name.git
-```
-
-Make sure you have Git installed on your system.
-
 ## Folder Structure
 
 The repository is organized into separate folders for each course's homework assignments. Feel free to navigate through the folders to find the assignments that interest you.
